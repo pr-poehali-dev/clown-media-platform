@@ -63,6 +63,8 @@ export default function Index() {
   const [posts, setPosts] = useState(MOCK_POSTS);
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   const toggleLike = (id: number) => {
     setPosts(posts.map(p =>
@@ -104,7 +106,7 @@ export default function Index() {
 
       {/* MAIN */}
       <main className="pt-14 pb-32 min-h-screen bg-gray-50 stripe-bg">
-        {activePage === "home"          && <HomePage setActivePage={setActivePage} />}
+        {activePage === "home"          && <HomePage setActivePage={setActivePage} onRegister={() => setShowRegister(true)} onLogin={() => setShowLogin(true)} />}
         {activePage === "feed"          && <FeedPage posts={posts} toggleLike={toggleLike} />}
         {activePage === "search"        && <SearchPage />}
         {activePage === "notifications" && <NotificationsPage />}
@@ -155,6 +157,24 @@ export default function Index() {
 
       {/* CREATE MODAL */}
       {showCreate && <CreateModal onClose={() => setShowCreate(false)} />}
+
+      {/* REGISTER MODAL */}
+      {showRegister && (
+        <AuthModal
+          mode="register"
+          onClose={() => setShowRegister(false)}
+          onSwitch={() => { setShowRegister(false); setShowLogin(true); }}
+        />
+      )}
+
+      {/* LOGIN MODAL */}
+      {showLogin && (
+        <AuthModal
+          mode="login"
+          onClose={() => setShowLogin(false)}
+          onSwitch={() => { setShowLogin(false); setShowRegister(true); }}
+        />
+      )}
     </div>
   );
 }
@@ -296,8 +316,150 @@ function CreateModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ─── AUTH MODAL ─── */
+function AuthModal({ mode, onClose, onSwitch }: {
+  mode: "register" | "login";
+  onClose: () => void;
+  onSwitch: () => void;
+}) {
+  const isReg = mode === "register";
+  const [form, setForm] = useState({
+    nickname: "", email: "", phone: "", about: "", password: "", confirmPassword: ""
+  });
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm(f => ({ ...f, [k]: e.target.value }));
+
+  const fields = isReg
+    ? [
+        { key: "nickname",        label: "Никнейм",          placeholder: "@твой_никнейм",      type: "text",     icon: "User" },
+        { key: "email",           label: "Электронная почта", placeholder: "example@mail.ru",    type: "email",    icon: "Mail" },
+        { key: "phone",           label: "Телефон (необяз.)", placeholder: "+7 900 000-00-00",   type: "tel",      icon: "PhoneCall" },
+        { key: "password",        label: "Пароль",            placeholder: "Минимум 8 символов", type: "password", icon: "Lock" },
+        { key: "confirmPassword", label: "Повтори пароль",    placeholder: "Ещё раз пароль",     type: "password", icon: "Lock" },
+      ]
+    : [
+        { key: "email",    label: "Электронная почта", placeholder: "example@mail.ru",    type: "email",    icon: "Mail" },
+        { key: "password", label: "Пароль",            placeholder: "Твой пароль",        type: "password", icon: "Lock" },
+      ];
+
+  const accentColor = isReg ? "#FF0033" : "#0044FF";
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-end justify-center"
+      style={{ background: "rgba(0,0,0,0.65)" }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full bg-white rounded-t-3xl p-5 animate-pop"
+        style={{ border: "3px solid #000", borderBottom: "none", maxHeight: "92vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Handle */}
+        <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-5"></div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <div
+              className="inline-block text-[10px] font-black px-2 py-0.5 rounded-full mb-1 font-oswald"
+              style={{ background: accentColor, color: "#fff" }}
+            >
+              {isReg ? "НОВЫЙ АККАУНТ" : "ВХОД"}
+            </div>
+            <h2 className="font-oswald text-2xl font-black text-black leading-none">
+              {isReg ? "РЕГИСТРАЦИЯ" : "ВОЙТИ В АККАУНТ"}
+            </h2>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 border-2 border-gray-200">
+            <Icon name="X" size={20} className="text-gray-500" />
+          </button>
+        </div>
+
+        {/* FIELDS */}
+        <div className="space-y-3 mb-4">
+          {fields.map((f) => (
+            <div key={f.key}>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">
+                {f.label}
+              </label>
+              <div className="relative">
+                <Icon name={f.icon} size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type={f.type}
+                  value={form[f.key as keyof typeof form]}
+                  onChange={set(f.key)}
+                  placeholder={f.placeholder}
+                  className="w-full bg-gray-50 border-2 border-black rounded-xl pl-10 pr-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none transition-all"
+                  style={{ fontFamily: "'Golos Text', sans-serif" }}
+                />
+              </div>
+            </div>
+          ))}
+
+          {/* О СЕБЕ — только регистрация */}
+          {isReg && (
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">
+                О себе (необязательно)
+              </label>
+              <textarea
+                value={form.about}
+                onChange={set("about")}
+                placeholder="Расскажи коротко: кто ты и о чём пишешь..."
+                rows={3}
+                className="w-full bg-gray-50 border-2 border-black rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none resize-none"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* FORGOT */}
+        {!isReg && (
+          <button className="text-xs font-bold text-gray-400 hover:text-black mb-4 block">
+            Забыл пароль?
+          </button>
+        )}
+
+        {/* AGREEMENT — только регистрация */}
+        {isReg && (
+          <p className="text-[11px] text-gray-400 mb-4 leading-relaxed">
+            Нажимая «Зарегистрироваться», ты соглашаешься с{" "}
+            <span className="font-bold text-black underline cursor-pointer">условиями использования</span>{" "}
+            и{" "}
+            <span className="font-bold text-black underline cursor-pointer">политикой конфиденциальности</span>
+          </p>
+        )}
+
+        {/* SUBMIT */}
+        <button
+          onClick={onClose}
+          className="w-full py-4 rounded-2xl text-base font-black text-white mb-3 font-oswald tracking-wide transition-all hover:opacity-90 active:scale-95"
+          style={{ background: accentColor, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+        >
+          {isReg ? "ЗАРЕГИСТРИРОВАТЬСЯ 🚀" : "ВОЙТИ →"}
+        </button>
+
+        {/* SWITCH */}
+        <div className="text-center pb-2">
+          <span className="text-sm text-gray-500">
+            {isReg ? "Уже есть аккаунт? " : "Нет аккаунта? "}
+          </span>
+          <button onClick={onSwitch} className="text-sm font-black underline" style={{ color: accentColor }}>
+            {isReg ? "Войти" : "Зарегистрироваться"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── HOME PAGE ─── */
-function HomePage({ setActivePage }: { setActivePage: (p: Page) => void }) {
+function HomePage({ setActivePage, onRegister, onLogin }: {
+  setActivePage: (p: Page) => void;
+  onRegister: () => void;
+  onLogin: () => void;
+}) {
   return (
     <div className="animate-fade-in">
       {/* HERO — РЕГИСТРАЦИЯ */}
@@ -344,13 +506,13 @@ function HomePage({ setActivePage }: { setActivePage: (p: Page) => void }) {
 
             <div className="flex gap-2">
               <button
-                onClick={() => setActivePage("feed")}
+                onClick={onRegister}
                 className="flex-1 py-3 rounded-2xl text-sm font-bold btn-red"
               >
                 ЗАРЕГИСТРИРОВАТЬСЯ
               </button>
               <button
-                onClick={() => setActivePage("feed")}
+                onClick={onLogin}
                 className="px-4 py-3 rounded-2xl text-sm font-bold btn-outline"
               >
                 Войти
