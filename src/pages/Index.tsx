@@ -316,6 +316,277 @@ function CreateModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ─── POLICY MODAL ─── */
+function PolicyModal({ onClose, onAccept }: { onClose: () => void; onAccept: () => void }) {
+  const [checked, setChecked] = useState(false);
+  const rules = [
+    { n: "1", title: "Возраст пользователей", text: "Сервис доступен лицам, достигшим 14 лет. Пользователи до 18 лет должны получить согласие родителей или законных представителей." },
+    { n: "2", title: "Персональные данные", text: "Мы собираем и обрабатываем ваши данные (имя, email, телефон) исключительно для работы платформы в соответствии с ФЗ-152 «О персональных данных»." },
+    { n: "3", title: "Запрещённый контент", text: "Запрещено публиковать материалы, нарушающие законодательство РФ: насилие, экстремизм, порнография, дискриминация по любому признаку." },
+    { n: "4", title: "Авторские права", text: "Публикуя контент, вы подтверждаете, что являетесь его автором или имеете право на его распространение. Нарушение влечёт удаление аккаунта." },
+    { n: "5", title: "Монетизация и платежи", text: "Платформа взимает комиссию 15% с доходов авторов. Вывод средств доступен от 1 000 ₽. Все операции защищены SSL-шифрованием." },
+    { n: "6", title: "Конфиденциальность данных", text: "Мы не передаём ваши данные третьим лицам без согласия, кроме случаев, предусмотренных законом. Данные хранятся на серверах в РФ." },
+    { n: "7", title: "Блокировка аккаунта", text: "Администрация вправе заблокировать аккаунт за нарушение правил без предупреждения и без возврата средств на балансе." },
+    { n: "8", title: "Изменение правил", text: "Платформа оставляет за собой право изменять настоящую политику. Пользователи будут уведомлены за 7 дней до вступления изменений в силу." },
+    { n: "9", title: "Хранение данных", text: "После удаления аккаунта ваши данные хранятся 90 дней для возможности восстановления, затем уничтожаются безвозвратно." },
+    { n: "10", title: "Применимое право", text: "Настоящая политика регулируется законодательством Российской Федерации. Все споры разрешаются в судах общей юрисдикции по месту нахождения Платформы." },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-end" style={{ background: "rgba(0,0,0,0.75)" }} onClick={onClose}>
+      <div
+        className="w-full bg-white rounded-t-3xl animate-pop flex flex-col"
+        style={{ border: "3px solid #000", borderBottom: "none", maxHeight: "90vh" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header fixed */}
+        <div className="px-5 pt-5 pb-3 border-b-2 border-black flex-shrink-0">
+          <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-4"></div>
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="inline-block text-[10px] font-black px-2 py-0.5 rounded-full mb-1 font-oswald text-white" style={{ background: "#8800FF" }}>ДОКУМЕНТ</span>
+              <h2 className="font-oswald text-xl font-black text-black">ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</h2>
+            </div>
+            <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 border-2 border-gray-200">
+              <Icon name="X" size={20} className="text-gray-500" />
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+          {rules.map((r) => (
+            <div key={r.n} className="flex gap-3">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white flex-shrink-0 mt-0.5 font-oswald"
+                style={{ background: "#000" }}
+              >
+                {r.n}
+              </div>
+              <div>
+                <p className="font-oswald font-bold text-sm text-black mb-1">{r.title}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{r.text}</p>
+              </div>
+            </div>
+          ))}
+          <div className="h-2"></div>
+        </div>
+
+        {/* Footer fixed */}
+        <div className="px-5 pb-5 pt-3 border-t-2 border-black flex-shrink-0">
+          <label className="flex items-start gap-3 cursor-pointer mb-4" onClick={() => setChecked(!checked)}>
+            <div
+              className="w-6 h-6 rounded-md border-2 border-black flex items-center justify-center flex-shrink-0 mt-0.5 transition-all"
+              style={{ background: checked ? "#00CC44" : "#fff", boxShadow: checked ? "2px 2px 0px #000" : "2px 2px 0px #ccc" }}
+            >
+              {checked && <Icon name="Check" size={14} className="text-white" />}
+            </div>
+            <span className="text-sm text-black font-medium leading-snug">
+              Я прочитал(а) и принимаю политику конфиденциальности и правила использования платформы Почемучка
+            </span>
+          </label>
+          <button
+            onClick={() => { if (checked) { onAccept(); onClose(); } }}
+            className="w-full py-4 rounded-2xl text-base font-black font-oswald tracking-wide transition-all"
+            style={{
+              background: checked ? "#00CC44" : "#ccc",
+              color: "#fff",
+              border: "2px solid #000",
+              boxShadow: checked ? "3px 3px 0px #000" : "none",
+              cursor: checked ? "pointer" : "not-allowed",
+            }}
+          >
+            {checked ? "ПРИНЯТЬ И ПРОДОЛЖИТЬ ✓" : "ОТМЕТЬТЕ ГАЛОЧКУ ВЫШЕ"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── FORGOT PASSWORD MODAL ─── */
+function ForgotModal({ onClose, onBackToLogin }: { onClose: () => void; onBackToLogin: () => void }) {
+  const [step, setStep] = useState<"email" | "code" | "newpass">("email");
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+
+  const handleCodeChange = (i: number, val: string) => {
+    if (val.length > 1) return;
+    const next = [...code];
+    next[i] = val;
+    setCode(next);
+    if (val && i < 5) {
+      const el = document.getElementById(`code-${i + 1}`);
+      el?.focus();
+    }
+  };
+
+  const stepColors = ["#0044FF", "#FF6600", "#00CC44"];
+  const stepIdx = step === "email" ? 0 : step === "code" ? 1 : 2;
+  const accentColor = stepColors[stepIdx];
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-end" style={{ background: "rgba(0,0,0,0.7)" }} onClick={onClose}>
+      <div
+        className="w-full bg-white rounded-t-3xl p-5 animate-pop"
+        style={{ border: "3px solid #000", borderBottom: "none", maxHeight: "85vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-5"></div>
+
+        {/* STEPS INDICATOR */}
+        <div className="flex items-center gap-2 mb-5">
+          {["Почта", "Код", "Пароль"].map((s, i) => (
+            <div key={s} className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black font-oswald text-white transition-all"
+                style={{ background: i <= stepIdx ? accentColor : "#ddd", border: "2px solid #000" }}
+              >
+                {i < stepIdx ? <Icon name="Check" size={12} className="text-white" /> : i + 1}
+              </div>
+              <span className={`text-xs font-bold font-oswald ${i <= stepIdx ? "text-black" : "text-gray-400"}`}>{s}</span>
+              {i < 2 && <div className="w-6 h-0.5" style={{ background: i < stepIdx ? accentColor : "#ddd" }}></div>}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <span
+              className="inline-block text-[10px] font-black px-2 py-0.5 rounded-full mb-1 font-oswald text-white"
+              style={{ background: accentColor }}
+            >
+              ШАГ {stepIdx + 1} ИЗ 3
+            </span>
+            <h2 className="font-oswald text-2xl font-black text-black leading-none">
+              {step === "email" && "ЗАБЫЛ ПАРОЛЬ?"}
+              {step === "code"  && "ВВЕДИ КОД"}
+              {step === "newpass" && "НОВЫЙ ПАРОЛЬ"}
+            </h2>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 border-2 border-gray-200">
+            <Icon name="X" size={20} className="text-gray-500" />
+          </button>
+        </div>
+
+        {/* STEP 1: EMAIL */}
+        {step === "email" && (
+          <div>
+            <p className="text-sm text-gray-500 mb-4">Укажи почту от аккаунта — отправим код для сброса пароля</p>
+            <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">Электронная почта</label>
+            <div className="relative mb-5">
+              <Icon name="Mail" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@mail.ru"
+                className="w-full bg-gray-50 border-2 border-black rounded-xl pl-10 pr-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none"
+              />
+            </div>
+            <button
+              onClick={() => setStep("code")}
+              className="w-full py-4 rounded-2xl text-base font-black font-oswald tracking-wide text-white mb-3"
+              style={{ background: accentColor, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+            >
+              ОТПРАВИТЬ КОД →
+            </button>
+          </div>
+        )}
+
+        {/* STEP 2: CODE */}
+        {step === "code" && (
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Код отправлен на</p>
+            <p className="font-oswald font-bold text-black mb-4">{email || "твою почту"}</p>
+            <div className="flex gap-2 justify-center mb-2">
+              {code.map((c, i) => (
+                <input
+                  key={i}
+                  id={`code-${i}`}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={c}
+                  onChange={(e) => handleCodeChange(i, e.target.value)}
+                  className="w-11 h-14 text-center text-xl font-black font-oswald border-2 border-black rounded-xl bg-gray-50 focus:outline-none focus:bg-white transition-all"
+                  style={{ boxShadow: c ? "2px 2px 0px #FF6600" : "2px 2px 0px #ccc" }}
+                />
+              ))}
+            </div>
+            <button className="text-xs font-bold text-gray-400 hover:text-black mb-5 block mx-auto">
+              Не пришёл код? Отправить снова
+            </button>
+            <button
+              onClick={() => setStep("newpass")}
+              className="w-full py-4 rounded-2xl text-base font-black font-oswald tracking-wide text-white mb-3"
+              style={{ background: accentColor, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+            >
+              ПОДТВЕРДИТЬ КОД →
+            </button>
+          </div>
+        )}
+
+        {/* STEP 3: NEW PASSWORD */}
+        {step === "newpass" && (
+          <div>
+            <p className="text-sm text-gray-500 mb-4">Придумай новый надёжный пароль</p>
+            <div className="space-y-3 mb-5">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">Новый пароль</label>
+                <div className="relative">
+                  <Icon name="Lock" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="password"
+                    value={newPass}
+                    onChange={(e) => setNewPass(e.target.value)}
+                    placeholder="Минимум 8 символов"
+                    className="w-full bg-gray-50 border-2 border-black rounded-xl pl-10 pr-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">Повтори пароль</label>
+                <div className="relative">
+                  <Icon name="Lock" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="password"
+                    value={confirmPass}
+                    onChange={(e) => setConfirmPass(e.target.value)}
+                    placeholder="Ещё раз пароль"
+                    className="w-full bg-gray-50 border-2 border-black rounded-xl pl-10 pr-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none"
+                  />
+                </div>
+              </div>
+              {confirmPass && newPass !== confirmPass && (
+                <p className="text-xs font-bold" style={{ color: "#FF0033" }}>⚠ Пароли не совпадают</p>
+              )}
+            </div>
+            <button
+              onClick={() => { onClose(); onBackToLogin(); }}
+              className="w-full py-4 rounded-2xl text-base font-black font-oswald tracking-wide text-white mb-3"
+              style={{ background: accentColor, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+            >
+              СОХРАНИТЬ ПАРОЛЬ ✓
+            </button>
+          </div>
+        )}
+
+        <div className="text-center pb-1">
+          <button
+            onClick={() => { onClose(); onBackToLogin(); }}
+            className="text-sm font-bold text-gray-400 hover:text-black"
+          >
+            ← Вернуться ко входу
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── AUTH MODAL ─── */
 function AuthModal({ mode, onClose, onSwitch }: {
   mode: "register" | "login";
@@ -326,131 +597,186 @@ function AuthModal({ mode, onClose, onSwitch }: {
   const [form, setForm] = useState({
     nickname: "", email: "", phone: "", about: "", password: "", confirmPassword: ""
   });
+  const [showForgot, setShowForgot] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
+
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }));
 
   const fields = isReg
     ? [
-        { key: "nickname",        label: "Никнейм",          placeholder: "@твой_никнейм",      type: "text",     icon: "User" },
-        { key: "email",           label: "Электронная почта", placeholder: "example@mail.ru",    type: "email",    icon: "Mail" },
-        { key: "phone",           label: "Телефон (необяз.)", placeholder: "+7 900 000-00-00",   type: "tel",      icon: "PhoneCall" },
-        { key: "password",        label: "Пароль",            placeholder: "Минимум 8 символов", type: "password", icon: "Lock" },
-        { key: "confirmPassword", label: "Повтори пароль",    placeholder: "Ещё раз пароль",     type: "password", icon: "Lock" },
+        { key: "nickname",        label: "Никнейм",           placeholder: "@твой_никнейм",      type: "text",     icon: "User" },
+        { key: "email",           label: "Электронная почта",  placeholder: "example@mail.ru",    type: "email",    icon: "Mail" },
+        { key: "phone",           label: "Телефон (необяз.)",  placeholder: "+7 900 000-00-00",   type: "tel",      icon: "PhoneCall" },
+        { key: "password",        label: "Пароль",             placeholder: "Минимум 8 символов", type: "password", icon: "Lock" },
+        { key: "confirmPassword", label: "Повтори пароль",     placeholder: "Ещё раз пароль",     type: "password", icon: "Lock" },
       ]
     : [
-        { key: "email",    label: "Электронная почта", placeholder: "example@mail.ru",    type: "email",    icon: "Mail" },
-        { key: "password", label: "Пароль",            placeholder: "Твой пароль",        type: "password", icon: "Lock" },
+        { key: "email",    label: "Электронная почта", placeholder: "example@mail.ru", type: "email",    icon: "Mail" },
+        { key: "password", label: "Пароль",            placeholder: "Твой пароль",     type: "password", icon: "Lock" },
       ];
 
   const accentColor = isReg ? "#FF0033" : "#0044FF";
+  const canSubmit = isReg ? policyAccepted : true;
 
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-end justify-center"
-      style={{ background: "rgba(0,0,0,0.65)" }}
-      onClick={onClose}
-    >
+    <>
       <div
-        className="w-full bg-white rounded-t-3xl p-5 animate-pop"
-        style={{ border: "3px solid #000", borderBottom: "none", maxHeight: "92vh", overflowY: "auto" }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-[70] flex items-end justify-center"
+        style={{ background: "rgba(0,0,0,0.65)" }}
+        onClick={onClose}
       >
-        {/* Handle */}
-        <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-5"></div>
+        <div
+          className="w-full bg-white rounded-t-3xl p-5 animate-pop"
+          style={{ border: "3px solid #000", borderBottom: "none", maxHeight: "92vh", overflowY: "auto" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-5"></div>
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <div
-              className="inline-block text-[10px] font-black px-2 py-0.5 rounded-full mb-1 font-oswald"
-              style={{ background: accentColor, color: "#fff" }}
-            >
-              {isReg ? "НОВЫЙ АККАУНТ" : "ВХОД"}
+          {/* Header */}
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <div
+                className="inline-block text-[10px] font-black px-2 py-0.5 rounded-full mb-1 font-oswald"
+                style={{ background: accentColor, color: "#fff" }}
+              >
+                {isReg ? "НОВЫЙ АККАУНТ" : "ВХОД"}
+              </div>
+              <h2 className="font-oswald text-2xl font-black text-black leading-none">
+                {isReg ? "РЕГИСТРАЦИЯ" : "ВОЙТИ В АККАУНТ"}
+              </h2>
             </div>
-            <h2 className="font-oswald text-2xl font-black text-black leading-none">
-              {isReg ? "РЕГИСТРАЦИЯ" : "ВОЙТИ В АККАУНТ"}
-            </h2>
+            <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 border-2 border-gray-200">
+              <Icon name="X" size={20} className="text-gray-500" />
+            </button>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 border-2 border-gray-200">
-            <Icon name="X" size={20} className="text-gray-500" />
-          </button>
-        </div>
 
-        {/* FIELDS */}
-        <div className="space-y-3 mb-4">
-          {fields.map((f) => (
-            <div key={f.key}>
-              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">
-                {f.label}
-              </label>
-              <div className="relative">
-                <Icon name={f.icon} size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type={f.type}
-                  value={form[f.key as keyof typeof form]}
-                  onChange={set(f.key)}
-                  placeholder={f.placeholder}
-                  className="w-full bg-gray-50 border-2 border-black rounded-xl pl-10 pr-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none transition-all"
-                  style={{ fontFamily: "'Golos Text', sans-serif" }}
+          {/* FIELDS */}
+          <div className="space-y-3 mb-4">
+            {fields.map((f) => (
+              <div key={f.key}>
+                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">
+                  {f.label}
+                </label>
+                <div className="relative">
+                  <Icon name={f.icon} size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type={f.type}
+                    value={form[f.key as keyof typeof form]}
+                    onChange={set(f.key)}
+                    placeholder={f.placeholder}
+                    className="w-full bg-gray-50 border-2 border-black rounded-xl pl-10 pr-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+            ))}
+
+            {isReg && (
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">
+                  О себе (необязательно)
+                </label>
+                <textarea
+                  value={form.about}
+                  onChange={set("about")}
+                  placeholder="Расскажи коротко: кто ты и о чём пишешь..."
+                  rows={3}
+                  className="w-full bg-gray-50 border-2 border-black rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none resize-none"
                 />
               </div>
-            </div>
-          ))}
+            )}
+          </div>
 
-          {/* О СЕБЕ — только регистрация */}
+          {/* FORGOT — только для входа */}
+          {!isReg && (
+            <button
+              onClick={() => setShowForgot(true)}
+              className="text-xs font-bold mb-4 block hover:underline"
+              style={{ color: accentColor }}
+            >
+              Забыл пароль?
+            </button>
+          )}
+
+          {/* AGREEMENT — только регистрация */}
           {isReg && (
-            <div>
-              <label className="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider font-oswald">
-                О себе (необязательно)
+            <div className="mb-4">
+              <label className="flex items-start gap-3 cursor-pointer mb-2" onClick={() => setPolicyAccepted(!policyAccepted)}>
+                <div
+                  className="w-5 h-5 rounded-md border-2 border-black flex items-center justify-center flex-shrink-0 mt-0.5 transition-all"
+                  style={{ background: policyAccepted ? "#00CC44" : "#fff" }}
+                >
+                  {policyAccepted && <Icon name="Check" size={12} className="text-white" />}
+                </div>
+                <span className="text-xs text-gray-600 leading-snug">
+                  Я принимаю{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowPolicy(true); }}
+                    className="font-bold text-black underline"
+                  >
+                    политику конфиденциальности
+                  </button>{" "}
+                  и{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowPolicy(true); }}
+                    className="font-bold text-black underline"
+                  >
+                    условия использования
+                  </button>
+                </span>
               </label>
-              <textarea
-                value={form.about}
-                onChange={set("about")}
-                placeholder="Расскажи коротко: кто ты и о чём пишешь..."
-                rows={3}
-                className="w-full bg-gray-50 border-2 border-black rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none resize-none"
-              />
+              {!policyAccepted && (
+                <p className="text-[10px] text-red-500 font-bold font-oswald pl-8">
+                  ⚠ Необходимо принять для регистрации
+                </p>
+              )}
             </div>
           )}
-        </div>
 
-        {/* FORGOT */}
-        {!isReg && (
-          <button className="text-xs font-bold text-gray-400 hover:text-black mb-4 block">
-            Забыл пароль?
+          {/* SUBMIT */}
+          <button
+            onClick={onClose}
+            disabled={!canSubmit}
+            className="w-full py-4 rounded-2xl text-base font-black font-oswald tracking-wide text-white mb-3 transition-all"
+            style={{
+              background: canSubmit ? accentColor : "#ccc",
+              border: "2px solid #000",
+              boxShadow: canSubmit ? "3px 3px 0px #000" : "none",
+              cursor: canSubmit ? "pointer" : "not-allowed",
+            }}
+          >
+            {isReg ? "ЗАРЕГИСТРИРОВАТЬСЯ 🚀" : "ВОЙТИ →"}
           </button>
-        )}
 
-        {/* AGREEMENT — только регистрация */}
-        {isReg && (
-          <p className="text-[11px] text-gray-400 mb-4 leading-relaxed">
-            Нажимая «Зарегистрироваться», ты соглашаешься с{" "}
-            <span className="font-bold text-black underline cursor-pointer">условиями использования</span>{" "}
-            и{" "}
-            <span className="font-bold text-black underline cursor-pointer">политикой конфиденциальности</span>
-          </p>
-        )}
-
-        {/* SUBMIT */}
-        <button
-          onClick={onClose}
-          className="w-full py-4 rounded-2xl text-base font-black text-white mb-3 font-oswald tracking-wide transition-all hover:opacity-90 active:scale-95"
-          style={{ background: accentColor, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
-        >
-          {isReg ? "ЗАРЕГИСТРИРОВАТЬСЯ 🚀" : "ВОЙТИ →"}
-        </button>
-
-        {/* SWITCH */}
-        <div className="text-center pb-2">
-          <span className="text-sm text-gray-500">
-            {isReg ? "Уже есть аккаунт? " : "Нет аккаунта? "}
-          </span>
-          <button onClick={onSwitch} className="text-sm font-black underline" style={{ color: accentColor }}>
-            {isReg ? "Войти" : "Зарегистрироваться"}
-          </button>
+          {/* SWITCH */}
+          <div className="text-center pb-2">
+            <span className="text-sm text-gray-500">
+              {isReg ? "Уже есть аккаунт? " : "Нет аккаунта? "}
+            </span>
+            <button onClick={onSwitch} className="text-sm font-black underline" style={{ color: accentColor }}>
+              {isReg ? "Войти" : "Зарегистрироваться"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* ВЛОЖЕННЫЕ МОДАЛКИ */}
+      {showForgot && (
+        <ForgotModal
+          onClose={() => setShowForgot(false)}
+          onBackToLogin={() => setShowForgot(false)}
+        />
+      )}
+      {showPolicy && (
+        <PolicyModal
+          onClose={() => setShowPolicy(false)}
+          onAccept={() => setPolicyAccepted(true)}
+        />
+      )}
+    </>
   );
 }
 
