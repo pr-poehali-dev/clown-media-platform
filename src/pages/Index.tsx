@@ -3,6 +3,15 @@ import Icon from "@/components/ui/icon";
 
 type Page = "home" | "feed" | "profile" | "search" | "subscriptions" | "messenger" | "support" | "notifications" | "manager" | "create";
 
+const MOCK_AUTHORS = [
+  { id: 1, name: "Алина Сова",    avatar: "🦉", category: "Наука",       followers: 12400, following: 34,  likes: 98200,  level: 42, color: "#00DDFF", about: "Рассказываю о науке простым языком. Кандидат биологических наук." },
+  { id: 2, name: "Дима Кодер",    avatar: "💻", category: "Технологии",  followers: 89100, following: 12,  likes: 341000, level: 78, color: "#8800FF", about: "Разработчик с 10 годами опыта. Пишу о коде, карьере и технологиях." },
+  { id: 3, name: "Марина Шеф",    avatar: "👩‍🍳", category: "Кулинария", followers: 34200, following: 89,  likes: 187000, level: 25, color: "#FF6600", about: "Шеф-повар, веду кулинарный блог и провожу мастер-классы." },
+  { id: 4, name: "Артём Гитара",  avatar: "🎸", category: "Музыка",      followers: 56700, following: 45,  likes: 224000, level: 61, color: "#FF00AA", about: "Музыкант, преподаватель гитары. Снимаю уроки и каверы." },
+  { id: 5, name: "Катя Художник", avatar: "🎨", category: "Творчество",  followers: 28900, following: 102, likes: 113000, level: 38, color: "#FFE000", about: "Иллюстратор и дизайнер. Делюсь процессом создания арта." },
+  { id: 6, name: "Игорь Спорт",   avatar: "🏋️", category: "Спорт",     followers: 71300, following: 27,  likes: 298000, level: 55, color: "#00CC44", about: "Тренер по силовым видам. Помогаю достичь результата без вреда здоровью." },
+];
+
 const MOCK_POSTS = [
   {
     id: 1, author: "Алина Сова", avatar: "🦉", level: 42, time: "2 мин назад",
@@ -65,6 +74,22 @@ export default function Index() {
   const [showCreate, setShowCreate] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [viewingAuthorId, setViewingAuthorId] = useState<number | null>(null);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setShowLogin(false);
+    setShowRegister(false);
+    setShowWelcome(true);
+    setActivePage("home");
+  };
+
+  const goToAuthor = (id: number) => {
+    setViewingAuthorId(id);
+    setActivePage("profile");
+  };
 
   const toggleLike = (id: number) => {
     setPosts(posts.map(p =>
@@ -106,14 +131,14 @@ export default function Index() {
 
       {/* MAIN */}
       <main className="pt-14 pb-32 min-h-screen bg-gray-50 stripe-bg">
-        {activePage === "home"          && <HomePage setActivePage={setActivePage} onRegister={() => setShowRegister(true)} onLogin={() => setShowLogin(true)} />}
-        {activePage === "feed"          && <FeedPage posts={posts} toggleLike={toggleLike} />}
-        {activePage === "search"        && <SearchPage />}
+        {activePage === "home"          && <HomePage setActivePage={setActivePage} onRegister={() => setShowRegister(true)} onLogin={() => setShowLogin(true)} isLoggedIn={isLoggedIn} goToAuthor={goToAuthor} />}
+        {activePage === "feed"          && <FeedPage posts={posts} toggleLike={toggleLike} goToAuthor={goToAuthor} />}
+        {activePage === "search"        && <SearchPage goToAuthor={goToAuthor} />}
         {activePage === "notifications" && <NotificationsPage />}
         {activePage === "messenger"     && <MessengerPage activeChat={activeChat} setActiveChat={setActiveChat} />}
-        {activePage === "subscriptions" && <SubscriptionsPage />}
+        {activePage === "subscriptions" && <SubscriptionsPage goToAuthor={goToAuthor} />}
         {activePage === "manager"       && <ManagerPage />}
-        {activePage === "profile"       && <ProfilePage />}
+        {activePage === "profile"       && <ProfilePage authorId={viewingAuthorId} onBack={() => { setViewingAuthorId(null); setActivePage("feed"); }} />}
         {activePage === "support"       && <SupportPage />}
       </main>
 
@@ -164,6 +189,7 @@ export default function Index() {
           mode="register"
           onClose={() => setShowRegister(false)}
           onSwitch={() => { setShowRegister(false); setShowLogin(true); }}
+          onSuccess={handleLogin}
         />
       )}
 
@@ -173,8 +199,12 @@ export default function Index() {
           mode="login"
           onClose={() => setShowLogin(false)}
           onSwitch={() => { setShowLogin(false); setShowRegister(true); }}
+          onSuccess={handleLogin}
         />
       )}
+
+      {/* WELCOME MODAL */}
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
     </div>
   );
 }
@@ -316,6 +346,45 @@ function CreateModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+/* ─── WELCOME MODAL ─── */
+function WelcomeModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-6" style={{ background: "rgba(0,0,0,0.7)" }} onClick={onClose}>
+      <div
+        className="w-full bg-white rounded-3xl p-7 text-center animate-pop"
+        style={{ border: "3px solid #000", boxShadow: "6px 6px 0px #FF0033", maxWidth: 340 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-6xl mb-3">🎉</div>
+        <div className="inline-block text-[10px] font-black px-2 py-0.5 rounded-full mb-2 font-oswald text-white" style={{ background: "#FF0033" }}>ДОБРО ПОЖАЛОВАТЬ</div>
+        <h2 className="font-oswald text-2xl font-black text-black mb-2 leading-tight">БЛАГОДАРИМ ЗА РЕГИСТРАЦИЮ НА ПОЧЕМУЧКЕ!</h2>
+        <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+          Твой аккаунт создан. Публикуй контент, собирай аудиторию и зарабатывай. Всё готово 🚀
+        </p>
+        <div className="grid grid-cols-3 gap-2 mb-5">
+          {[
+            { icon: "📝", label: "Пиши посты" },
+            { icon: "🔴", label: "Стримь" },
+            { icon: "💰", label: "Зарабатывай" },
+          ].map((i) => (
+            <div key={i.label} className="g-card p-2 text-center">
+              <div className="text-2xl mb-1">{i.icon}</div>
+              <p className="text-[10px] font-bold font-oswald text-black">{i.label}</p>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full py-3.5 rounded-2xl text-base font-black font-oswald text-white"
+          style={{ background: "#FF0033", border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+        >
+          НАЧАТЬ 🤔
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── POLICY MODAL ─── */
 function PolicyModal({ onClose, onAccept }: { onClose: () => void; onAccept: () => void }) {
   const [checked, setChecked] = useState(false);
@@ -330,6 +399,7 @@ function PolicyModal({ onClose, onAccept }: { onClose: () => void; onAccept: () 
     { n: "8", title: "Изменение правил", text: "Платформа оставляет за собой право изменять настоящую политику. Пользователи будут уведомлены за 7 дней до вступления изменений в силу." },
     { n: "9", title: "Хранение данных", text: "После удаления аккаунта ваши данные хранятся 90 дней для возможности восстановления, затем уничтожаются безвозвратно." },
     { n: "10", title: "Применимое право", text: "Настоящая политика регулируется законодательством Российской Федерации. Все споры разрешаются в судах общей юрисдикции по месту нахождения Платформы." },
+    { n: "11", title: "Система уровней и XP", text: "Каждый пользователь имеет уровень, который растёт через активность: +10 XP за каждый лайк вашего поста, +25 XP за нового подписчика, +15 XP за комментарий под вашим постом. Уровень влияет на видимость в рекомендациях и открывает новые возможности монетизации." },
   ];
 
   return (
@@ -588,10 +658,11 @@ function ForgotModal({ onClose, onBackToLogin }: { onClose: () => void; onBackTo
 }
 
 /* ─── AUTH MODAL ─── */
-function AuthModal({ mode, onClose, onSwitch }: {
+function AuthModal({ mode, onClose, onSwitch, onSuccess }: {
   mode: "register" | "login";
   onClose: () => void;
   onSwitch: () => void;
+  onSuccess: () => void;
 }) {
   const isReg = mode === "register";
   const [form, setForm] = useState({
@@ -738,7 +809,7 @@ function AuthModal({ mode, onClose, onSwitch }: {
 
           {/* SUBMIT */}
           <button
-            onClick={onClose}
+            onClick={() => { if (canSubmit) onSuccess(); }}
             disabled={!canSubmit}
             className="w-full py-4 rounded-2xl text-base font-black font-oswald tracking-wide text-white mb-3 transition-all"
             style={{
@@ -781,27 +852,122 @@ function AuthModal({ mode, onClose, onSwitch }: {
 }
 
 /* ─── HOME PAGE ─── */
-function HomePage({ setActivePage, onRegister, onLogin }: {
+function HomePage({ setActivePage, onRegister, onLogin, isLoggedIn, goToAuthor }: {
   setActivePage: (p: Page) => void;
   onRegister: () => void;
   onLogin: () => void;
+  isLoggedIn: boolean;
+  goToAuthor: (id: number) => void;
 }) {
+  // Залогиненная главная — профиль пользователя
+  if (isLoggedIn) {
+    return (
+      <div className="animate-fade-in">
+        {/* PROFILE HERO */}
+        <div className="h-28 w-full stripe-bg" style={{ background: "#FFE000", borderBottom: "3px solid #000" }}></div>
+        <div className="px-4 pb-4">
+          <div className="flex items-end justify-between -mt-9 mb-4">
+            <div className="w-18 h-18 rounded-2xl bg-white flex items-center justify-center text-4xl border-3 border-black" style={{ width: 72, height: 72, border: "3px solid #000", boxShadow: "3px 3px 0px #000" }}>
+              😎
+            </div>
+            <button className="btn-outline px-4 py-2 rounded-xl text-sm flex items-center gap-1.5">
+              <Icon name="Pencil" size={14} />
+              Изменить
+            </button>
+          </div>
+
+          <h2 className="font-oswald text-2xl font-bold text-black">Александр Иванов</h2>
+          <p className="text-gray-500 text-sm mb-4">@alex_curious · Спрашиваю обо всём 🤔</p>
+
+          {/* STATS */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {[
+              { label: "Подписчики", value: "4 280", color: "#FF00AA" },
+              { label: "Подписки",   value: "138",   color: "#0044FF" },
+              { label: "Лайки",      value: "18.4K", color: "#FF0033" },
+            ].map((s) => (
+              <div key={s.label} className="g-card p-3 text-center" style={{ borderColor: s.color, boxShadow: `3px 3px 0px ${s.color}` }}>
+                <p className="font-oswald text-xl font-bold text-black">{s.value}</p>
+                <p className="text-xs text-gray-500">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* LEVEL BAR */}
+          <div className="g-card g-card-yellow p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-oswald font-bold text-sm text-black">Уровень 34 — Исследователь</span>
+              <span className="text-xs font-bold text-gray-600">2 340 / 3 000 XP</span>
+            </div>
+            <div className="h-3 bg-gray-200 rounded-full overflow-hidden border-2 border-black">
+              <div className="h-full rounded-full" style={{ width: "78%", background: "#FFE000" }}></div>
+            </div>
+            <p className="text-[11px] text-gray-500 mt-2">+10 XP за лайк · +25 XP за подписчика · +15 XP за комментарий</p>
+          </div>
+
+          {/* MY POSTS */}
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-oswald font-bold text-black">МОИ ПОСТЫ</p>
+            <button onClick={() => setActivePage("manager")} className="text-xs font-bold text-red-600 font-oswald">Все →</button>
+          </div>
+          <div className="space-y-3 mb-4">
+            {MOCK_POSTS.slice(0, 2).map((p) => (
+              <div key={p.id} className="g-card p-3 flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-oswald font-bold text-sm text-black truncate">{p.title}</p>
+                  <div className="flex gap-3 mt-1 text-xs text-gray-500">
+                    <span>❤️ {p.likes.toLocaleString()}</span>
+                    <span>💬 {p.comments}</span>
+                    <span>↗ {p.shares}</span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full font-oswald" style={{ background: p.tagBg, color: p.tagColor, border: "1.5px solid #000" }}>{p.tag}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* ACHIEVEMENTS */}
+          <p className="font-oswald font-bold text-black mb-3">ДОСТИЖЕНИЯ</p>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {ACHIEVEMENTS.map((a) => (
+              <div key={a.title} className={`g-card p-3 text-center ${!a.unlocked ? "opacity-40" : ""}`}>
+                <div className="text-2xl mb-1">{a.icon}</div>
+                <p className="text-[10px] font-bold text-black font-oswald">{a.title}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* LIVE */}
+          <div className="g-card g-card-red p-4 flex items-center gap-4 cursor-pointer mb-4" onClick={() => setActivePage("feed")}>
+            <div className="w-12 h-12 rounded-xl bg-black flex items-center justify-center text-2xl border-2 border-black flex-shrink-0">💻</div>
+            <div className="flex-1">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white font-oswald" style={{ background: "#FF0033" }}>● LIVE 2 830</span>
+              <p className="font-oswald font-bold text-sm text-black mt-1">Дима Кодер — Пишем приложение</p>
+            </div>
+            <button className="btn-black px-3 py-2 rounded-xl text-xs text-white">СМОТРЕТЬ</button>
+          </div>
+
+          {/* SUPPORT */}
+          <div className="g-card g-card-green p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "#00CC44", border: "2px solid #000" }}>📞</div>
+            <div className="flex-1">
+              <p className="font-oswald font-bold text-sm text-black">Поддержка</p>
+              <a href="tel:+79521426352" className="font-oswald font-bold text-sm text-green-700">+7 952 142-63-52</a>
+            </div>
+            <a href="tel:+79521426352" className="btn-yellow px-3 py-2 rounded-xl text-xs text-black">ЗВОНИТЬ</a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Незалогиненная главная — лендинг
   return (
     <div className="animate-fade-in">
-      {/* HERO — РЕГИСТРАЦИЯ */}
       <div className="px-4 pt-5 pb-2">
-        <div
-          className="relative rounded-3xl overflow-hidden p-6"
-          style={{ background: "#000", border: "3px solid #000", boxShadow: "5px 5px 0px #FF0033" }}
-        >
-          {/* Декоративные полосы */}
-          <div className="absolute top-0 right-0 w-32 h-32 opacity-20" style={{
-            background: "radial-gradient(circle, #FFE000 0%, transparent 70%)"
-          }}></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 opacity-15" style={{
-            background: "radial-gradient(circle, #FF00AA 0%, transparent 70%)"
-          }}></div>
-
+        <div className="relative rounded-3xl overflow-hidden p-6" style={{ background: "#000", border: "3px solid #000", boxShadow: "5px 5px 0px #FF0033" }}>
+          <div className="absolute top-0 right-0 w-32 h-32 opacity-20" style={{ background: "radial-gradient(circle, #FFE000 0%, transparent 70%)" }}></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 opacity-15" style={{ background: "radial-gradient(circle, #FF00AA 0%, transparent 70%)" }}></div>
           <div className="relative">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-3xl">🤔</span>
@@ -810,45 +976,22 @@ function HomePage({ setActivePage, onRegister, onLogin }: {
                 <p className="text-xs text-gray-400">Платформа для авторов</p>
               </div>
             </div>
-
-            <p className="text-white/80 text-sm mb-4 leading-relaxed">
-              Создавай контент, зарабатывай на подписках и донатах, строй свою аудиторию
-            </p>
-
+            <p className="text-white/80 text-sm mb-4 leading-relaxed">Создавай контент, зарабатывай на подписках и донатах, строй свою аудиторию</p>
             <div className="flex gap-2 mb-4">
-              <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
-                <span className="text-xs">💰</span>
-                <span className="text-[11px] text-white/80 font-medium">Заработок</span>
-              </div>
-              <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
-                <span className="text-xs">🔴</span>
-                <span className="text-[11px] text-white/80 font-medium">Эфиры</span>
-              </div>
-              <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
-                <span className="text-xs">🏆</span>
-                <span className="text-[11px] text-white/80 font-medium">Достижения</span>
-              </div>
+              {["💰 Заработок", "🔴 Эфиры", "🏆 Достижения"].map((b) => (
+                <div key={b} className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
+                  <span className="text-[11px] text-white/80 font-medium">{b}</span>
+                </div>
+              ))}
             </div>
-
             <div className="flex gap-2">
-              <button
-                onClick={onRegister}
-                className="flex-1 py-3 rounded-2xl text-sm font-bold btn-red"
-              >
-                ЗАРЕГИСТРИРОВАТЬСЯ
-              </button>
-              <button
-                onClick={onLogin}
-                className="px-4 py-3 rounded-2xl text-sm font-bold btn-outline"
-              >
-                Войти
-              </button>
+              <button onClick={onRegister} className="flex-1 py-3 rounded-2xl text-sm font-bold btn-red">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+              <button onClick={onLogin} className="px-4 py-3 rounded-2xl text-sm font-bold btn-outline">Войти</button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* FEATURES */}
       <div className="px-4 pt-4 pb-2">
         <h2 className="font-oswald text-xl font-bold text-black mb-3">ЧТО ТЫ ПОЛУЧИШЬ</h2>
         <div className="grid grid-cols-2 gap-3">
@@ -867,60 +1010,40 @@ function HomePage({ setActivePage, onRegister, onLogin }: {
         </div>
       </div>
 
-      {/* LIVE BLOCK */}
+      {/* АВТОРЫ */}
       <div className="px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-oswald text-xl font-bold text-black">🔴 СЕЙЧАС В ЭФИРЕ</h2>
-          <button onClick={() => setActivePage("feed")} className="text-xs font-bold text-red-600 font-oswald">ВСЕ →</button>
-        </div>
-        <div
-          className="g-card g-card-red p-4 flex items-center gap-4 cursor-pointer"
-          onClick={() => setActivePage("feed")}
-        >
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black">
-            💻
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white font-oswald"
-                style={{ background: "#FF0033", animation: "pulse 2s infinite" }}
-              >● LIVE</span>
-              <span className="text-xs text-gray-500">2 830 зрителей</span>
-            </div>
-            <p className="font-oswald font-bold text-sm text-black">Дима Кодер</p>
-            <p className="text-xs text-gray-500">«Пишем мобильное приложение»</p>
-          </div>
-          <button className="btn-black px-3 py-2 rounded-xl text-xs text-white">
-            СМОТРЕТЬ
-          </button>
+        <h2 className="font-oswald text-xl font-bold text-black mb-3">ТОП АВТОРЫ</h2>
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+          {MOCK_AUTHORS.slice(0, 4).map((a) => (
+            <button key={a.id} onClick={() => goToAuthor(a.id)} className="flex-shrink-0 g-card p-3 text-center w-28" style={{ borderColor: a.color, boxShadow: `3px 3px 0px ${a.color}` }}>
+              <div className="text-3xl mb-1">{a.avatar}</div>
+              <p className="font-oswald font-bold text-xs text-black truncate">{a.name}</p>
+              <p className="text-[10px] text-gray-500">{(a.followers / 1000).toFixed(1)}K</p>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* SUPPORT */}
-      <div className="px-4 pt-4 pb-6">
-        <div
-          className="g-card g-card-green p-4 flex items-center gap-4"
-        >
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: "#00CC44", border: "2px solid #000" }}>
-            📞
+      <div className="px-4 pt-4 pb-2">
+        <div className="g-card g-card-red p-4 flex items-center gap-4 cursor-pointer" onClick={() => setActivePage("feed")}>
+          <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black">💻</div>
+          <div className="flex-1">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white font-oswald" style={{ background: "#FF0033" }}>● LIVE 2 830</span>
+            <p className="font-oswald font-bold text-sm text-black mt-1">Дима Кодер</p>
+            <p className="text-xs text-gray-500">«Пишем мобильное приложение»</p>
           </div>
+          <button className="btn-black px-3 py-2 rounded-xl text-xs text-white">СМОТРЕТЬ</button>
+        </div>
+      </div>
+
+      <div className="px-4 pt-4 pb-6">
+        <div className="g-card g-card-green p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: "#00CC44", border: "2px solid #000" }}>📞</div>
           <div className="flex-1">
             <p className="font-oswald font-bold text-sm text-black">Нужна помощь?</p>
-            <p className="text-xs text-gray-500 mb-1">Звони — ответим быстро</p>
-            <a
-              href="tel:+79521426352"
-              className="font-oswald font-bold text-sm text-green-700"
-            >
-              +7 952 142-63-52
-            </a>
+            <a href="tel:+79521426352" className="font-oswald font-bold text-sm text-green-700">+7 952 142-63-52</a>
           </div>
-          <a
-            href="tel:+79521426352"
-            className="btn-yellow px-3 py-2 rounded-xl text-xs text-black"
-          >
-            ПОЗВОНИТЬ
-          </a>
+          <a href="tel:+79521426352" className="btn-yellow px-3 py-2 rounded-xl text-xs text-black">ПОЗВОНИТЬ</a>
         </div>
       </div>
     </div>
@@ -928,25 +1051,23 @@ function HomePage({ setActivePage, onRegister, onLogin }: {
 }
 
 /* ─── FEED PAGE ─── */
-function FeedPage({ posts, toggleLike }: { posts: typeof MOCK_POSTS; toggleLike: (id: number) => void }) {
+function FeedPage({ posts, toggleLike, goToAuthor }: { posts: typeof MOCK_POSTS; toggleLike: (id: number) => void; goToAuthor: (id: number) => void }) {
+  const [filter, setFilter] = useState(0);
   return (
     <div className="px-4 pt-4 animate-fade-in">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-oswald text-2xl font-bold text-black">ЛЕНТА</h2>
         <div className="flex gap-1.5">
           {["Все", "Подписки", "ТОП"].map((f, i) => (
-            <button
-              key={f}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold font-oswald transition-all ${i === 0 ? "btn-black text-white" : "btn-outline text-black"}`}
-            >
-              {f}
-            </button>
+            <button key={f} onClick={() => setFilter(i)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold font-oswald transition-all ${filter === i ? "btn-black text-white" : "btn-outline text-black"}`}
+            >{f}</button>
           ))}
         </div>
       </div>
       <div className="space-y-4">
         {posts.map((post, i) => (
-          <PostCard key={post.id} post={post} toggleLike={toggleLike} delay={i * 70} />
+          <PostCard key={post.id} post={post} toggleLike={toggleLike} delay={i * 70} goToAuthor={goToAuthor} />
         ))}
       </div>
     </div>
@@ -954,29 +1075,45 @@ function FeedPage({ posts, toggleLike }: { posts: typeof MOCK_POSTS; toggleLike:
 }
 
 /* ─── POST CARD ─── */
-function PostCard({ post, toggleLike, delay = 0 }: {
+const MOCK_COMMENTS = [
+  { id: 1, author: "Катя Художник", avatar: "🎨", text: "Очень интересно! Спасибо за объяснение 🔥", time: "1 мин" },
+  { id: 2, author: "Игорь Спорт",   avatar: "🏋️", text: "Подписался, жду новых постов!", time: "5 мин" },
+  { id: 3, author: "Алина Сова",    avatar: "🦉", text: "Согласна полностью, наука рулит 💯", time: "12 мин" },
+];
+
+function PostCard({ post, toggleLike, delay = 0, goToAuthor }: {
   post: typeof MOCK_POSTS[0];
   toggleLike: (id: number) => void;
   delay?: number;
+  goToAuthor: (id: number) => void;
 }) {
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [localComments, setLocalComments] = useState(MOCK_COMMENTS.slice(0, 2));
+
+  const authorId = MOCK_AUTHORS.find(a => a.name === post.author)?.id ?? 1;
+
+  const sendComment = () => {
+    if (!newComment.trim()) return;
+    setLocalComments([{ id: Date.now(), author: "Вы", avatar: "😎", text: newComment, time: "сейчас" }, ...localComments]);
+    setNewComment("");
+  };
+
   return (
     <div className="g-card p-4 animate-fade-in" style={{ animationDelay: `${delay}ms` }}>
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl border-2 border-black flex-shrink-0">
+        <button onClick={() => goToAuthor(authorId)} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl border-2 border-black flex-shrink-0 hover:scale-105 transition-transform">
           {post.avatar}
-        </div>
+        </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-oswald font-bold text-sm text-black">{post.author}</span>
+            <button onClick={() => goToAuthor(authorId)} className="font-oswald font-bold text-sm text-black hover:underline">{post.author}</button>
             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-black text-white">Ур.{post.level}</span>
             {post.isPremium && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-black" style={{ background: "#FFE000" }}>💎 PRO</span>}
           </div>
           <span className="text-xs text-gray-400">{post.time}</span>
         </div>
-        <span
-          className="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 font-oswald"
-          style={{ background: post.tagBg, color: post.tagColor, border: "1.5px solid #000" }}
-        >
+        <span className="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 font-oswald" style={{ background: post.tagBg, color: post.tagColor, border: "1.5px solid #000" }}>
           {post.tag}
         </span>
       </div>
@@ -984,39 +1121,66 @@ function PostCard({ post, toggleLike, delay = 0 }: {
       <h3 className="font-oswald text-lg font-bold text-black mb-2 leading-tight">{post.title}</h3>
       <p className="text-sm text-gray-600 leading-relaxed mb-4">{post.text}</p>
 
-      <div className="flex items-center justify-between pt-3 border-t-2 border-black">
+      <div className="flex items-center justify-between pt-3 border-t-2 border-black mb-0">
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => toggleLike(post.id)}
-            className={`flex items-center gap-1.5 text-sm font-bold font-oswald transition-all ${post.isLiked ? "text-red-600" : "text-gray-400 hover:text-red-500"}`}
-          >
+          <button onClick={() => toggleLike(post.id)} className={`flex items-center gap-1.5 text-sm font-bold font-oswald transition-all ${post.isLiked ? "text-red-600" : "text-gray-400 hover:text-red-500"}`}>
             <Icon name="Heart" size={18} />
             <span>{post.likes.toLocaleString()}</span>
           </button>
-          <button className="flex items-center gap-1.5 text-sm font-bold font-oswald text-gray-400 hover:text-blue-600 transition-all">
+          <button onClick={() => setShowComments(!showComments)} className={`flex items-center gap-1.5 text-sm font-bold font-oswald transition-all ${showComments ? "text-blue-600" : "text-gray-400 hover:text-blue-600"}`}>
             <Icon name="MessageCircle" size={18} />
-            <span>{post.comments}</span>
+            <span>{localComments.length + post.comments - 2}</span>
           </button>
           <button className="flex items-center gap-1.5 text-sm font-bold font-oswald text-gray-400 hover:text-purple-600 transition-all">
             <Icon name="Share2" size={18} />
             <span>{post.shares}</span>
           </button>
         </div>
-        <button
-          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl font-bold font-oswald transition-all"
-          style={{ background: "#FF00AA", color: "#fff", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}
-        >
-          <Icon name="Gift" size={14} />
-          ДОНАТ
+        <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl font-bold font-oswald" style={{ background: "#FF00AA", color: "#fff", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
+          <Icon name="Gift" size={14} />ДОНАТ
         </button>
       </div>
+
+      {/* КОММЕНТАРИИ */}
+      {showComments && (
+        <div className="mt-3 pt-3 border-t-2 border-dashed border-gray-200">
+          <div className="flex gap-2 mb-3">
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-base border-2 border-black flex-shrink-0">😎</div>
+            <div className="flex-1 flex gap-2">
+              <input
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && sendComment()}
+                placeholder="Написать комментарий..."
+                className="flex-1 bg-gray-50 border-2 border-black rounded-xl px-3 py-2 text-xs text-black placeholder-gray-400 focus:outline-none"
+              />
+              <button onClick={sendComment} className="px-3 py-2 rounded-xl text-xs font-bold font-oswald btn-red text-white">→</button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {localComments.map((c) => (
+              <div key={c.id} className="flex gap-2">
+                <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-sm border-2 border-black flex-shrink-0">{c.avatar}</div>
+                <div className="flex-1 bg-gray-50 rounded-xl px-3 py-2 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="font-oswald font-bold text-xs text-black">{c.author}</span>
+                    <span className="text-[10px] text-gray-400">{c.time}</span>
+                  </div>
+                  <p className="text-xs text-gray-700">{c.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 /* ─── SEARCH PAGE ─── */
-function SearchPage() {
+function SearchPage({ goToAuthor }: { goToAuthor: (id: number) => void }) {
   const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"all" | "authors" | "posts">("all");
   const categories = [
     { icon: "🔬", label: "Наука",       bg: "#00DDFF", color: "#000" },
     { icon: "💻", label: "Технологии",  bg: "#8800FF", color: "#fff" },
@@ -1027,32 +1191,117 @@ function SearchPage() {
     { icon: "🧠", label: "Психология",  bg: "#0044FF", color: "#fff" },
     { icon: "📸", label: "Фото/Видео",  bg: "#FF0033", color: "#fff" },
   ];
+
+  const filteredAuthors = MOCK_AUTHORS.filter(a =>
+    !query || a.name.toLowerCase().includes(query.toLowerCase()) || a.category.toLowerCase().includes(query.toLowerCase())
+  );
+  const filteredPosts = MOCK_POSTS.filter(p =>
+    !query || p.title.toLowerCase().includes(query.toLowerCase()) || p.tag.toLowerCase().includes(query.toLowerCase())
+  );
+
   return (
     <div className="px-4 pt-4 animate-fade-in">
       <h2 className="font-oswald text-2xl font-bold text-black mb-4">ПОИСК</h2>
-      <div className="relative mb-5">
+      <div className="relative mb-4">
         <Icon name="Search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Авторы, темы, посты..."
-          className="w-full bg-white border-2 border-black rounded-2xl pl-11 pr-4 py-3.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="w-full bg-white border-2 border-black rounded-2xl pl-11 pr-4 py-3.5 text-sm text-black placeholder-gray-400 focus:outline-none"
           style={{ boxShadow: "3px 3px 0px #000" }}
         />
       </div>
-      <p className="font-oswald font-bold text-xs text-gray-500 mb-3 uppercase tracking-wider">Категории</p>
-      <div className="grid grid-cols-2 gap-3">
-        {categories.map((cat) => (
-          <button
-            key={cat.label}
-            className="flex items-center gap-3 p-4 rounded-2xl text-left hover:scale-105 transition-transform font-oswald font-bold text-sm"
-            style={{ background: cat.bg, color: cat.color, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+
+      {/* TABS */}
+      <div className="flex gap-2 mb-4">
+        {(["all", "authors", "posts"] as const).map((t) => (
+          <button key={t} onClick={() => setActiveTab(t)}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold font-oswald transition-all ${activeTab === t ? "btn-black text-white" : "btn-outline text-black"}`}
           >
-            <span className="text-2xl">{cat.icon}</span>
-            {cat.label}
+            {t === "all" ? "Все" : t === "authors" ? "Авторы" : "Посты"}
           </button>
         ))}
       </div>
+
+      {/* РЕЗУЛЬТАТЫ ПОИСКА */}
+      {query ? (
+        <div>
+          {(activeTab === "all" || activeTab === "authors") && filteredAuthors.length > 0 && (
+            <div className="mb-4">
+              <p className="font-oswald font-bold text-xs text-gray-500 mb-2 uppercase tracking-wider">Авторы</p>
+              <div className="space-y-2">
+                {filteredAuthors.map((a) => (
+                  <button key={a.id} onClick={() => goToAuthor(a.id)} className="w-full g-card p-3 flex items-center gap-3 text-left" style={{ borderColor: a.color, boxShadow: `3px 3px 0px ${a.color}` }}>
+                    <div className="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-2xl border-2 border-black flex-shrink-0">{a.avatar}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-oswald font-bold text-sm text-black">{a.name}</p>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-black text-white">Ур.{a.level}</span>
+                      </div>
+                      <p className="text-xs text-gray-500">{a.category} · {(a.followers / 1000).toFixed(1)}K подписчиков</p>
+                    </div>
+                    <Icon name="ChevronRight" size={16} className="text-gray-400" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {(activeTab === "all" || activeTab === "posts") && filteredPosts.length > 0 && (
+            <div>
+              <p className="font-oswald font-bold text-xs text-gray-500 mb-2 uppercase tracking-wider">Посты</p>
+              <div className="space-y-2">
+                {filteredPosts.map((p) => (
+                  <div key={p.id} className="g-card p-3 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-oswald font-bold text-sm text-black truncate">{p.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-gray-500">{p.author}</span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full font-oswald" style={{ background: p.tagBg, color: p.tagColor }}>{p.tag}</span>
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-400">❤️ {p.likes.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {filteredAuthors.length === 0 && filteredPosts.length === 0 && (
+            <div className="text-center py-10">
+              <p className="text-4xl mb-2">🔍</p>
+              <p className="font-oswald font-bold text-black">Ничего не найдено</p>
+              <p className="text-sm text-gray-500">Попробуй другой запрос</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          <p className="font-oswald font-bold text-xs text-gray-500 mb-3 uppercase tracking-wider">Популярные авторы</p>
+          <div className="space-y-2 mb-5">
+            {MOCK_AUTHORS.map((a) => (
+              <button key={a.id} onClick={() => goToAuthor(a.id)} className="w-full g-card p-3 flex items-center gap-3 text-left" style={{ borderColor: a.color, boxShadow: `3px 3px 0px ${a.color}` }}>
+                <div className="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-2xl border-2 border-black flex-shrink-0">{a.avatar}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-oswald font-bold text-sm text-black">{a.name}</p>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-black text-white">Ур.{a.level}</span>
+                  </div>
+                  <p className="text-xs text-gray-500">{a.category} · {(a.followers / 1000).toFixed(1)}K подписчиков</p>
+                </div>
+                <Icon name="ChevronRight" size={16} className="text-gray-400" />
+              </button>
+            ))}
+          </div>
+          <p className="font-oswald font-bold text-xs text-gray-500 mb-3 uppercase tracking-wider">Категории</p>
+          <div className="grid grid-cols-2 gap-3">
+            {categories.map((cat) => (
+              <button key={cat.label} className="flex items-center gap-3 p-4 rounded-2xl text-left hover:scale-105 transition-transform font-oswald font-bold text-sm" style={{ background: cat.bg, color: cat.color, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}>
+                <span className="text-2xl">{cat.icon}</span>{cat.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1163,48 +1412,41 @@ function MessengerPage({ activeChat, setActiveChat }: {
 }
 
 /* ─── SUBSCRIPTIONS PAGE ─── */
-function SubscriptionsPage() {
-  const authors = [
-    { id: 1, name: "Алина Сова", avatar: "🦉", category: "Наука", followers: "12.4K", level: 42, subscribed: true, color: "#00DDFF" },
-    { id: 2, name: "Дима Кодер", avatar: "💻", category: "Технологии", followers: "89.1K", level: 78, subscribed: true, color: "#8800FF" },
-    { id: 3, name: "Марина Шеф", avatar: "👩‍🍳", category: "Кулинария", followers: "34.2K", level: 25, subscribed: false, color: "#FF6600" },
-    { id: 4, name: "Артём Гитара", avatar: "🎸", category: "Музыка", followers: "56.7K", level: 61, subscribed: true, color: "#FF00AA" },
-  ];
-  const [subs, setSubs] = useState(authors);
+function SubscriptionsPage({ goToAuthor }: { goToAuthor: (id: number) => void }) {
+  const [subs, setSubs] = useState(
+    MOCK_AUTHORS.map(a => ({ ...a, subscribed: [1, 2, 4].includes(a.id) }))
+  );
+  const [tab, setTab] = useState(0);
+  const displayed = tab === 0 ? subs.filter(a => a.subscribed) : subs;
 
   return (
     <div className="px-4 pt-4 animate-fade-in">
       <h2 className="font-oswald text-2xl font-bold text-black mb-4">ПОДПИСКИ</h2>
       <div className="flex gap-2 mb-4">
-        {["Мои подписки", "Рекомендации"].map((t, i) => (
-          <button key={t} className={`px-4 py-2 rounded-full text-sm font-bold font-oswald transition-all ${i === 0 ? "btn-black text-white" : "btn-outline text-black"}`}>
-            {t}
-          </button>
+        {["Мои подписки", "Все авторы"].map((t, i) => (
+          <button key={t} onClick={() => setTab(i)} className={`px-4 py-2 rounded-full text-sm font-bold font-oswald transition-all ${tab === i ? "btn-black text-white" : "btn-outline text-black"}`}>{t}</button>
         ))}
       </div>
       <div className="space-y-3">
-        {subs.map((a) => (
-          <div key={a.id} className="g-card p-4 flex items-center gap-3">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black"
-              style={{ background: a.color + "33" }}
-            >
+        {displayed.map((a) => (
+          <div key={a.id} className="g-card p-4 flex items-center gap-3" style={{ borderColor: a.color, boxShadow: `3px 3px 0px ${a.color}` }}>
+            <button onClick={() => goToAuthor(a.id)} className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black hover:scale-105 transition-transform">
               {a.avatar}
-            </div>
-            <div className="flex-1 min-w-0">
+            </button>
+            <div className="flex-1 min-w-0 cursor-pointer" onClick={() => goToAuthor(a.id)}>
               <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                 <span className="font-oswald font-bold text-black text-sm">{a.name}</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-black text-white">Ур.{a.level}</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>{a.category}</span><span>•</span><span>{a.followers}</span>
+                <span>{a.category}</span><span>•</span><span>{(a.followers / 1000).toFixed(1)}K</span>
               </div>
             </div>
             <button
               onClick={() => setSubs(subs.map(s => s.id === a.id ? { ...s, subscribed: !s.subscribed } : s))}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold font-oswald flex-shrink-0 transition-all ${a.subscribed ? "btn-outline text-black" : "btn-red text-white"}`}
             >
-              {a.subscribed ? "Отписаться" : "Подписаться"}
+              {a.subscribed ? "Отписан" : "Подписаться"}
             </button>
           </div>
         ))}
@@ -1327,45 +1569,121 @@ function ManagerPage() {
 }
 
 /* ─── PROFILE PAGE ─── */
-function ProfilePage() {
-  return (
-    <div className="animate-fade-in">
-      <div className="h-32 w-full stripe-bg" style={{ background: "#FFE000", borderBottom: "3px solid #000" }}>
-        <div className="h-full flex items-center px-6">
-          <span className="font-oswald text-4xl font-black text-black opacity-10 select-none">ПОЧЕМУЧКА</span>
+function ProfilePage({ authorId, onBack }: { authorId: number | null; onBack: () => void }) {
+  const author = authorId ? MOCK_AUTHORS.find(a => a.id === authorId) : null;
+  const [subscribed, setSubscribed] = useState(false);
+
+  const authorPosts = MOCK_POSTS.filter(p => author ? p.author === author.name : false);
+
+  if (author) {
+    // Профиль другого пользователя
+    const levelName = author.level >= 70 ? "Легенда" : author.level >= 50 ? "Мастер" : author.level >= 30 ? "Эксперт" : "Автор";
+    const xpPct = Math.round((author.level % 10) * 10);
+    return (
+      <div className="animate-fade-in">
+        <div className="h-28 w-full" style={{ background: author.color, borderBottom: "3px solid #000" }}></div>
+        <div className="px-4 pb-6">
+          <div className="flex items-end justify-between -mt-9 mb-3">
+            <div className="w-18 h-18 rounded-2xl bg-white flex items-center justify-center text-4xl border-3 border-black" style={{ width: 72, height: 72, border: "3px solid #000", boxShadow: `3px 3px 0px ${author.color}` }}>
+              {author.avatar}
+            </div>
+            <div className="flex gap-2 mt-10">
+              <button className="btn-outline px-3 py-2 rounded-xl text-xs flex items-center gap-1">
+                <Icon name="MessageCircle" size={14} />Написать
+              </button>
+              <button
+                onClick={() => setSubscribed(!subscribed)}
+                className={`px-3 py-2 rounded-xl text-xs font-bold font-oswald transition-all ${subscribed ? "btn-outline text-black" : "btn-red text-white"}`}
+              >
+                {subscribed ? "Отписан" : "Подписаться"}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="font-oswald text-2xl font-bold text-black">{author.name}</h2>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-black text-white font-oswald">Ур.{author.level}</span>
+          </div>
+          <p className="text-xs text-gray-500 mb-1">{author.category}</p>
+          <p className="text-sm text-gray-600 mb-4">{author.about}</p>
+
+          {/* STATS */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {[
+              { label: "Подписчики", value: (author.followers / 1000).toFixed(1) + "K", color: "#FF00AA" },
+              { label: "Подписки",   value: author.following.toString(),               color: "#0044FF" },
+              { label: "Лайки",      value: (author.likes / 1000).toFixed(0) + "K",   color: "#FF0033" },
+            ].map((s) => (
+              <div key={s.label} className="g-card p-3 text-center" style={{ borderColor: s.color, boxShadow: `3px 3px 0px ${s.color}` }}>
+                <p className="font-oswald text-xl font-bold text-black">{s.value}</p>
+                <p className="text-xs text-gray-500">{s.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* LEVEL */}
+          <div className="g-card g-card-yellow p-4 mb-4">
+            <div className="flex justify-between mb-2">
+              <span className="font-oswald font-bold text-sm text-black">Уровень {author.level} — {levelName}</span>
+              <span className="text-xs font-bold text-gray-600">{xpPct * 30} / 3 000 XP</span>
+            </div>
+            <div className="h-3 bg-gray-200 rounded-full overflow-hidden border-2 border-black">
+              <div className="h-full rounded-full" style={{ width: `${xpPct}%`, background: author.color }}></div>
+            </div>
+          </div>
+
+          {/* ACHIEVEMENTS */}
+          <p className="font-oswald font-bold text-black mb-3">ДОСТИЖЕНИЯ</p>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {ACHIEVEMENTS.map((a) => (
+              <div key={a.title} className={`g-card p-3 text-center ${!a.unlocked ? "opacity-40" : ""}`}>
+                <div className="text-2xl mb-1">{a.icon}</div>
+                <p className="text-[10px] font-bold text-black font-oswald">{a.title}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* POSTS */}
+          <p className="font-oswald font-bold text-black mb-3">ПОСТЫ АВТОРА</p>
+          <div className="space-y-3 mb-4">
+            {(authorPosts.length ? authorPosts : MOCK_POSTS).map((p) => (
+              <div key={p.id} className="g-card p-3 flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-oswald font-bold text-sm text-black truncate">{p.title}</p>
+                  <div className="flex gap-3 mt-1 text-xs text-gray-500">
+                    <span>❤️ {p.likes.toLocaleString()}</span><span>💬 {p.comments}</span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full font-oswald" style={{ background: p.tagBg, color: p.tagColor, border: "1.5px solid #000" }}>{p.tag}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* DONATE */}
+          <button className="w-full py-3.5 rounded-2xl text-sm font-black font-oswald text-white flex items-center justify-center gap-2" style={{ background: "#FF00AA", border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}>
+            <Icon name="Gift" size={18} className="text-white" /> ПОДДЕРЖАТЬ ДОНАТОМ
+          </button>
         </div>
       </div>
+    );
+  }
+
+  // Свой профиль (переход из нав-бара без авторId)
+  return (
+    <div className="animate-fade-in">
+      <div className="h-32 w-full stripe-bg" style={{ background: "#FFE000", borderBottom: "3px solid #000" }}></div>
       <div className="px-4 pb-6">
         <div className="flex items-end justify-between -mt-10 mb-4">
-          <div
-            className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center text-4xl border-3 border-black"
-            style={{ border: "3px solid #000", boxShadow: "4px 4px 0px #000" }}
-          >
-            😎
-          </div>
-          <button className="btn-outline px-4 py-2 rounded-xl text-sm">Редактировать</button>
+          <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center text-4xl" style={{ border: "3px solid #000", boxShadow: "4px 4px 0px #000" }}>😎</div>
+          <button className="btn-outline px-4 py-2 rounded-xl text-sm flex items-center gap-1.5"><Icon name="Pencil" size={14} />Редактировать</button>
         </div>
-
         <h2 className="font-oswald text-2xl font-bold text-black">Александр Иванов</h2>
         <p className="text-gray-500 text-sm mb-4">@alex_curious · Спрашиваю обо всём 🤔</p>
-
-        {/* LEVEL BAR */}
-        <div className="g-card g-card-yellow p-4 mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-oswald font-bold text-sm text-black">Уровень 34 — Исследователь</span>
-            <span className="text-xs font-bold text-gray-600">2 340 / 3 000 XP</span>
-          </div>
-          <div className="h-3 bg-gray-200 rounded-full overflow-hidden border-2 border-black">
-            <div className="h-full rounded-full" style={{ width: "78%", background: "#FFE000" }}></div>
-          </div>
-        </div>
-
-        {/* STATS */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
             { label: "Подписчики", value: "4 280", color: "#FF00AA" },
-            { label: "Посты", value: "127", color: "#0044FF" },
-            { label: "Донаты", value: "18.4K₽", color: "#00CC44" },
+            { label: "Подписки",   value: "138",   color: "#0044FF" },
+            { label: "Лайки",      value: "18.4K", color: "#FF0033" },
           ].map((s) => (
             <div key={s.label} className="g-card p-3 text-center" style={{ borderColor: s.color, boxShadow: `3px 3px 0px ${s.color}` }}>
               <p className="font-oswald text-xl font-bold text-black">{s.value}</p>
@@ -1373,40 +1691,32 @@ function ProfilePage() {
             </div>
           ))}
         </div>
-
-        {/* ACHIEVEMENTS */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="font-oswald font-bold text-black">ДОСТИЖЕНИЯ</p>
-            <button className="text-xs font-bold text-red-600 font-oswald">Все →</button>
+        <div className="g-card g-card-yellow p-4 mb-4">
+          <div className="flex justify-between mb-2">
+            <span className="font-oswald font-bold text-sm text-black">Уровень 34 — Исследователь</span>
+            <span className="text-xs font-bold text-gray-600">2 340 / 3 000 XP</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {ACHIEVEMENTS.map((a) => (
-              <div
-                key={a.title}
-                className={`g-card p-3 text-center ${!a.unlocked ? "opacity-40" : ""}`}
-              >
-                <div className="text-2xl mb-1">{a.icon}</div>
-                <p className="text-[10px] font-bold text-black font-oswald">{a.title}</p>
-              </div>
-            ))}
+          <div className="h-3 bg-gray-200 rounded-full overflow-hidden border-2 border-black">
+            <div className="h-full rounded-full" style={{ width: "78%", background: "#FFE000" }}></div>
           </div>
         </div>
-
-        {/* MONETIZATION */}
+        <p className="font-oswald font-bold text-black mb-3">ДОСТИЖЕНИЯ</p>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {ACHIEVEMENTS.map((a) => (
+            <div key={a.title} className={`g-card p-3 text-center ${!a.unlocked ? "opacity-40" : ""}`}>
+              <div className="text-2xl mb-1">{a.icon}</div>
+              <p className="text-[10px] font-bold text-black font-oswald">{a.title}</p>
+            </div>
+          ))}
+        </div>
         <div className="g-card g-card-red p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">💰</span>
-            <p className="font-oswald font-bold text-black">МОНЕТИЗАЦИЯ</p>
-          </div>
+          <div className="flex items-center gap-2 mb-3"><span>💰</span><p className="font-oswald font-bold text-black">МОНЕТИЗАЦИЯ</p></div>
           <div className="grid grid-cols-2 gap-2">
-            <button className="p-3 rounded-xl text-center hover:opacity-90 transition-all" style={{ background: "#8800FF", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
-              <p className="text-2xl mb-1">🎁</p>
-              <p className="text-xs text-white font-bold font-oswald">Подписки</p>
+            <button className="p-3 rounded-xl text-center" style={{ background: "#8800FF", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
+              <p className="text-2xl mb-1">🎁</p><p className="text-xs text-white font-bold font-oswald">Подписки</p>
             </button>
-            <button className="p-3 rounded-xl text-center hover:opacity-90 transition-all" style={{ background: "#FF00AA", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
-              <p className="text-2xl mb-1">💎</p>
-              <p className="text-xs text-white font-bold font-oswald">Продажи</p>
+            <button className="p-3 rounded-xl text-center" style={{ background: "#FF00AA", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
+              <p className="text-2xl mb-1">💎</p><p className="text-xs text-white font-bold font-oswald">Продажи</p>
             </button>
           </div>
         </div>
