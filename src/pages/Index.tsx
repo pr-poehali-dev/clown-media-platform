@@ -1,79 +1,30 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
-type Page = "home" | "feed" | "profile" | "search" | "subscriptions" | "messenger" | "support" | "notifications";
+type Page = "home" | "feed" | "profile" | "search" | "subscriptions" | "messenger" | "support" | "notifications" | "manager" | "create";
 
 const MOCK_POSTS = [
   {
-    id: 1,
-    author: "Алина Сова",
-    avatar: "🦉",
-    level: 42,
-    badge: "Мастер",
-    time: "2 мин назад",
-    tag: "Наука",
-    tagColor: "bg-cyan-500/20 text-cyan-400",
+    id: 1, author: "Алина Сова", avatar: "🦉", level: 42, time: "2 мин назад",
+    tag: "Наука", tagBg: "#00DDFF", tagColor: "#000",
     title: "Почему небо голубое? Объясняю за 60 секунд",
-    text: "Всё дело в рэлеевском рассеянии! Молекулы воздуха рассеивают коротковолновый синий свет сильнее, чем красный. Именно поэтому мы видим синее небо днём и красные закаты вечером.",
-    likes: 1284,
-    comments: 87,
-    shares: 203,
-    isLiked: false,
-    isPremium: false,
+    text: "Всё дело в рэлеевском рассеянии! Молекулы воздуха рассеивают коротковолновый синий свет сильнее, чем красный.",
+    likes: 1284, comments: 87, shares: 203, isLiked: false, isPremium: false,
   },
   {
-    id: 2,
-    author: "Дима Кодер",
-    avatar: "💻",
-    level: 78,
-    badge: "Легенда",
-    time: "15 мин назад",
-    tag: "Технологии",
-    tagColor: "bg-purple-500/20 text-purple-400",
-    title: "Как работает искусственный интеллект — простыми словами",
-    text: "ИИ — это математика + данные. Нейронная сеть обучается на миллионах примеров и учится находить закономерности. Никакой магии, только статистика.",
-    likes: 3421,
-    comments: 256,
-    shares: 891,
-    isLiked: true,
-    isPremium: true,
+    id: 2, author: "Дима Кодер", avatar: "💻", level: 78, time: "15 мин назад",
+    tag: "Технологии", tagBg: "#8800FF", tagColor: "#fff",
+    title: "Как работает ИИ — простыми словами",
+    text: "ИИ — это математика + данные. Нейронная сеть обучается на миллионах примеров. Никакой магии, только статистика.",
+    likes: 3421, comments: 256, shares: 891, isLiked: true, isPremium: true,
   },
   {
-    id: 3,
-    author: "Марина Шеф",
-    avatar: "👩‍🍳",
-    level: 25,
-    badge: "Эксперт",
-    time: "1 час назад",
-    tag: "Кулинария",
-    tagColor: "bg-orange-500/20 text-orange-400",
-    title: "Секрет идеальной пасты: три ошибки которые вы делаете",
-    text: "Первая — мало воды. Вторая — недосоленная вода. Третья — промываете пасту холодной водой после варки. Исправьте это — и результат вас удивит.",
-    likes: 892,
-    comments: 143,
-    shares: 67,
-    isLiked: false,
-    isPremium: false,
+    id: 3, author: "Марина Шеф", avatar: "👩‍🍳", level: 25, time: "1 час назад",
+    tag: "Кулинария", tagBg: "#FF6600", tagColor: "#fff",
+    title: "Секрет идеальной пасты: 3 ошибки",
+    text: "Мало воды. Недосоленная вода. Промываете пасту холодной водой после варки. Исправьте — результат удивит.",
+    likes: 892, comments: 143, shares: 67, isLiked: false, isPremium: false,
   },
-];
-
-const MOCK_STORIES = [
-  { id: 1, name: "Вы", avatar: "➕", isAdd: true, isLive: false },
-  { id: 2, name: "Алина", avatar: "🦉", isAdd: false, isLive: false },
-  { id: 3, name: "Дима", avatar: "💻", isAdd: false, isLive: true },
-  { id: 4, name: "Марина", avatar: "👩‍🍳", isAdd: false, isLive: false },
-  { id: 5, name: "Артём", avatar: "🎸", isAdd: false, isLive: false },
-  { id: 6, name: "Катя", avatar: "🎨", isAdd: false, isLive: true },
-  { id: 7, name: "Игорь", avatar: "🏋️", isAdd: false, isLive: false },
-];
-
-const MOCK_NOTIFICATIONS = [
-  { id: 1, icon: "❤️", text: "Алина Сова лайкнула ваш пост", time: "2 мин", isNew: true },
-  { id: 2, icon: "💬", text: "Дима Кодер ответил на ваш комментарий", time: "10 мин", isNew: true },
-  { id: 3, icon: "🔔", text: "Новый подписчик: Марина Шеф", time: "1 час", isNew: true },
-  { id: 4, icon: "💰", text: "Вы получили донат 500₽ от Артёма", time: "3 часа", isNew: false },
-  { id: 5, icon: "🏆", text: "Новое достижение: «Популярный автор»", time: "вчера", isNew: false },
-  { id: 6, icon: "⭐", text: "Ваш пост попал в рекомендации", time: "вчера", isNew: false },
 ];
 
 const MOCK_CHATS = [
@@ -83,176 +34,406 @@ const MOCK_CHATS = [
   { id: 4, name: "Артём Гитара", avatar: "🎸", msg: "Новый трек вышел!", time: "вчера", unread: 0, online: false },
 ];
 
+const MOCK_NOTIFICATIONS = [
+  { id: 1, icon: "❤️", text: "Алина лайкнула ваш пост", time: "2 мин", isNew: true },
+  { id: 2, icon: "💬", text: "Дима ответил на ваш комментарий", time: "10 мин", isNew: true },
+  { id: 3, icon: "🔔", text: "Новый подписчик: Марина Шеф", time: "1 час", isNew: true },
+  { id: 4, icon: "💰", text: "Донат 500₽ от Артёма", time: "3 часа", isNew: false },
+  { id: 5, icon: "🏆", text: "Новое достижение: «Популярный автор»", time: "вчера", isNew: false },
+];
+
 const ACHIEVEMENTS = [
-  { icon: "🏆", title: "Популярный автор", desc: "1000+ лайков", unlocked: true },
-  { icon: "🔥", title: "На волне", desc: "7 дней подряд", unlocked: true },
-  { icon: "💎", title: "Легенда", desc: "10 000 подписчиков", unlocked: false },
-  { icon: "🚀", title: "Запуск", desc: "Первый пост", unlocked: true },
-  { icon: "🎯", title: "В яблочко", desc: "100 репостов", unlocked: true },
-  { icon: "⚡", title: "Молния", desc: "Пост за день", unlocked: false },
+  { icon: "🏆", title: "Популярный", unlocked: true },
+  { icon: "🔥", title: "На волне", unlocked: true },
+  { icon: "💎", title: "Легенда", unlocked: false },
+  { icon: "🚀", title: "Запуск", unlocked: true },
+  { icon: "🎯", title: "В яблочко", unlocked: true },
+  { icon: "⚡", title: "Молния", unlocked: false },
+];
+
+const MANAGER_STATS = [
+  { label: "Просмотры", value: "24 810", change: "+18%", color: "#0044FF" },
+  { label: "Доход", value: "18 400₽", change: "+31%", color: "#00CC44" },
+  { label: "Подписчики", value: "4 280", change: "+7%", color: "#FF00AA" },
+  { label: "Репосты", value: "1 203", change: "+12%", color: "#FF6600" },
 ];
 
 export default function Index() {
   const [activePage, setActivePage] = useState<Page>("home");
   const [posts, setPosts] = useState(MOCK_POSTS);
   const [activeChat, setActiveChat] = useState<number | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
 
   const toggleLike = (id: number) => {
     setPosts(posts.map(p =>
-      p.id === id
-        ? { ...p, isLiked: !p.isLiked, likes: p.isLiked ? p.likes - 1 : p.likes + 1 }
-        : p
+      p.id === id ? { ...p, isLiked: !p.isLiked, likes: p.isLiked ? p.likes - 1 : p.likes + 1 } : p
     ));
   };
 
   const navItems = [
-    { id: "home", icon: "Home", label: "Главная" },
-    { id: "feed", icon: "LayoutGrid", label: "Лента" },
-    { id: "search", icon: "Search", label: "Поиск" },
-    { id: "notifications", icon: "Bell", label: "Уведомления" },
-    { id: "messenger", icon: "MessageCircle", label: "Сообщения" },
-    { id: "subscriptions", icon: "Users", label: "Подписки" },
-    { id: "profile", icon: "User", label: "Профиль" },
-    { id: "support", icon: "LifeBuoy", label: "Поддержка" },
+    { id: "home",          icon: "Home",          label: "Главная" },
+    { id: "feed",          icon: "LayoutGrid",    label: "Лента" },
+    { id: "search",        icon: "Search",        label: "Поиск" },
+    { id: "notifications", icon: "Bell",          label: "Уведомл." },
+    { id: "messenger",     icon: "MessageCircle", label: "Чат" },
+    { id: "subscriptions", icon: "Users",         label: "Подписки" },
+    { id: "manager",       icon: "BarChart2",     label: "Менеджер" },
+    { id: "profile",       icon: "User",          label: "Профиль" },
+    { id: "support",       icon: "LifeBuoy",      label: "Поддержка" },
   ] as const;
 
   return (
-    <div className="min-h-screen mesh-bg font-golos">
+    <div className="min-h-screen bg-white font-golos">
       {/* TOP BAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 nav-glow px-4 py-3 flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 top-bar px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🤔</span>
-          <span className="font-oswald text-xl font-bold gradient-text">ПОЧЕМУЧКА</span>
+          <span className="font-oswald text-xl font-bold text-white tracking-wide">ПОЧЕМУЧКА</span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full ml-1" style={{ background: "#FFE000", color: "#000" }}>BETA</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setActivePage("notifications")}
-            className="relative p-2 rounded-full hover:bg-white/10 transition-all"
-          >
-            <Icon name="Bell" size={20} className="text-white/70" />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-pink-500"></span>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setActivePage("notifications")} className="relative p-2 rounded-full hover:bg-white/10 transition-all">
+            <Icon name="Bell" size={20} className="text-white" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"></span>
           </button>
-          <button
-            onClick={() => setActivePage("messenger")}
-            className="p-2 rounded-full hover:bg-white/10 transition-all"
-          >
-            <Icon name="MessageCircle" size={20} className="text-white/70" />
+          <button onClick={() => setActivePage("messenger")} className="p-2 rounded-full hover:bg-white/10 transition-all">
+            <Icon name="MessageCircle" size={20} className="text-white" />
           </button>
         </div>
       </header>
 
       {/* MAIN */}
-      <main className="pt-16 pb-28 min-h-screen">
-        {activePage === "home" && <HomePage setActivePage={setActivePage} posts={posts} toggleLike={toggleLike} />}
-        {activePage === "feed" && <FeedPage posts={posts} toggleLike={toggleLike} />}
-        {activePage === "search" && <SearchPage />}
+      <main className="pt-14 pb-32 min-h-screen bg-gray-50 stripe-bg">
+        {activePage === "home"          && <HomePage setActivePage={setActivePage} />}
+        {activePage === "feed"          && <FeedPage posts={posts} toggleLike={toggleLike} />}
+        {activePage === "search"        && <SearchPage />}
         {activePage === "notifications" && <NotificationsPage />}
-        {activePage === "messenger" && <MessengerPage activeChat={activeChat} setActiveChat={setActiveChat} />}
+        {activePage === "messenger"     && <MessengerPage activeChat={activeChat} setActiveChat={setActiveChat} />}
         {activePage === "subscriptions" && <SubscriptionsPage />}
-        {activePage === "profile" && <ProfilePage />}
-        {activePage === "support" && <SupportPage />}
+        {activePage === "manager"       && <ManagerPage />}
+        {activePage === "profile"       && <ProfilePage />}
+        {activePage === "support"       && <SupportPage />}
       </main>
 
+      {/* FAB КНОПКА + */}
+      <button
+        onClick={() => setShowCreate(true)}
+        className="fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95"
+        style={{ background: "#FF0033", border: "3px solid #000", boxShadow: "4px 4px 0px #000" }}
+      >
+        <Icon name="Plus" size={28} className="text-white" />
+      </button>
+
       {/* BOTTOM NAV */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 nav-glow px-2 py-2">
-        <div className="flex items-center justify-around">
-          {navItems.map((item) => (
+      <nav className="fixed bottom-0 left-0 right-0 z-40 nav-bar">
+        <div className="flex items-center justify-around px-1 py-2">
+          {navItems.map((item) => {
+            const isActive = activePage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActivePage(item.id as Page)}
+                className="flex flex-col items-center gap-0.5 px-1 py-1 rounded-xl transition-all"
+              >
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-xl transition-all relative"
+                  style={isActive ? { background: "#FF0033", color: "#fff" } : { color: "#555" }}
+                >
+                  <Icon name={item.icon} size={18} />
+                  {item.id === "notifications" && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
+                  )}
+                </div>
+                <span className={`text-[8px] font-semibold font-oswald tracking-wide ${isActive ? "text-red-600" : "text-gray-400"}`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      {/* CREATE MODAL */}
+      {showCreate && <CreateModal onClose={() => setShowCreate(false)} />}
+    </div>
+  );
+}
+
+/* ─── CREATE MODAL ─── */
+function CreateModal({ onClose }: { onClose: () => void }) {
+  const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
+  const [selectedTag, setSelectedTag] = useState("Наука");
+  const tags = ["Наука", "Технологии", "Кулинария", "Музыка", "Спорт", "Психология", "Творчество", "Бизнес"];
+  const tagColors: Record<string, { bg: string; color: string }> = {
+    "Наука": { bg: "#00DDFF", color: "#000" },
+    "Технологии": { bg: "#8800FF", color: "#fff" },
+    "Кулинария": { bg: "#FF6600", color: "#fff" },
+    "Музыка": { bg: "#FF00AA", color: "#fff" },
+    "Спорт": { bg: "#00CC44", color: "#fff" },
+    "Психология": { bg: "#0044FF", color: "#fff" },
+    "Творчество": { bg: "#FFE000", color: "#000" },
+    "Бизнес": { bg: "#FF0033", color: "#fff" },
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex flex-col" style={{ background: "rgba(0,0,0,0.6)" }} onClick={onClose}>
+      <div
+        className="mt-auto bg-white rounded-t-3xl p-5 animate-pop"
+        style={{ border: "3px solid #000", borderBottom: "none", maxHeight: "90vh", overflowY: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Handle */}
+        <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-5"></div>
+
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-oswald text-2xl font-bold text-black">НОВЫЙ ПОСТ</h2>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
+            <Icon name="X" size={22} className="text-gray-500" />
+          </button>
+        </div>
+
+        {/* TYPE BUTTONS */}
+        <div className="flex gap-2 mb-5 overflow-x-auto scrollbar-hide pb-1">
+          {[
+            { icon: "📝", label: "Текст", active: true },
+            { icon: "📸", label: "Фото" },
+            { icon: "🎬", label: "Видео" },
+            { icon: "🎙️", label: "Аудио" },
+            { icon: "📊", label: "Опрос" },
+            { icon: "🔴", label: "Эфир" },
+          ].map((t) => (
             <button
-              key={item.id}
-              onClick={() => setActivePage(item.id as Page)}
-              className={`flex flex-col items-center gap-0.5 p-2 rounded-xl transition-all ${
-                activePage === item.id
-                  ? "text-purple-400"
-                  : "text-white/35 hover:text-white/70"
+              key={t.label}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all font-oswald ${
+                t.active
+                  ? "text-white"
+                  : "bg-gray-100 text-gray-600 border-2 border-gray-200 hover:border-black"
               }`}
+              style={t.active ? { background: "#000", border: "2px solid #000" } : {}}
             >
-              <div className={`relative ${activePage === item.id ? "scale-110" : ""} transition-transform`}>
-                <Icon name={item.icon} size={20} />
-                {item.id === "notifications" && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-pink-500"></span>
-                )}
-              </div>
-              <span className="text-[9px] font-medium">{item.label}</span>
+              <span>{t.icon}</span>
+              {t.label}
             </button>
           ))}
         </div>
-      </nav>
+
+        {/* TITLE */}
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Заголовок поста..."
+          className="w-full bg-gray-50 border-2 border-black rounded-xl px-4 py-3 text-sm font-semibold text-black placeholder-gray-400 focus:outline-none mb-3"
+          style={{ fontFamily: "'Oswald', sans-serif", fontSize: "16px" }}
+        />
+
+        {/* TEXT */}
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="О чём хочешь рассказать?"
+          rows={4}
+          className="w-full bg-gray-50 border-2 border-black rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none resize-none mb-4"
+        />
+
+        {/* PHOTO UPLOAD */}
+        <div
+          className="w-full rounded-xl mb-4 flex flex-col items-center justify-center gap-2 py-5 cursor-pointer hover:bg-gray-100 transition-all"
+          style={{ border: "2px dashed #000", background: "#fafafa" }}
+        >
+          <Icon name="Image" size={28} className="text-gray-400" />
+          <span className="text-sm text-gray-500 font-medium">Добавить фото или видео</span>
+        </div>
+
+        {/* TAGS */}
+        <p className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Категория</p>
+        <div className="flex gap-2 flex-wrap mb-5">
+          {tags.map((tag) => {
+            const tc = tagColors[tag];
+            return (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(tag)}
+                className="text-xs font-bold px-3 py-1.5 rounded-full transition-all font-oswald"
+                style={selectedTag === tag
+                  ? { background: tc.bg, color: tc.color, border: "2px solid #000", boxShadow: "2px 2px 0px #000" }
+                  : { background: "#f5f5f5", color: "#555", border: "2px solid #ddd" }
+                }
+              >
+                {tag}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* MONETIZE */}
+        <div className="g-card g-card-yellow p-4 mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl">💰</span>
+            <span className="font-oswald font-bold text-sm text-black">Монетизация</span>
+          </div>
+          <div className="flex gap-2">
+            <button className="flex-1 py-2 rounded-xl text-xs font-bold font-oswald bg-yellow-400 text-black border-2 border-black">
+              🆓 Бесплатно
+            </button>
+            <button className="flex-1 py-2 rounded-xl text-xs font-bold font-oswald bg-gray-100 text-gray-600 border-2 border-gray-300 hover:border-black transition-all">
+              💎 Платно
+            </button>
+            <button className="flex-1 py-2 rounded-xl text-xs font-bold font-oswald bg-gray-100 text-gray-600 border-2 border-gray-300 hover:border-black transition-all">
+              🔒 Подписка
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full py-4 rounded-2xl text-lg font-bold btn-red"
+        >
+          ОПУБЛИКОВАТЬ
+        </button>
+      </div>
     </div>
   );
 }
 
 /* ─── HOME PAGE ─── */
-function HomePage({ setActivePage, posts, toggleLike }: {
-  setActivePage: (p: Page) => void;
-  posts: typeof MOCK_POSTS;
-  toggleLike: (id: number) => void;
-}) {
+function HomePage({ setActivePage }: { setActivePage: (p: Page) => void }) {
   return (
     <div className="animate-fade-in">
-      {/* HERO */}
-      <div className="px-4 pt-4 pb-5">
-        <div className="relative rounded-3xl overflow-hidden p-6" style={{
-          background: "linear-gradient(135deg, #1a1040 0%, #2d1060 50%, #1a0830 100%)",
-          border: "1px solid rgba(168,85,247,0.3)"
-        }}>
-          <div className="absolute inset-0 opacity-30" style={{
-            background: "radial-gradient(ellipse at 70% 30%, rgba(168,85,247,0.4), transparent 60%)"
+      {/* HERO — РЕГИСТРАЦИЯ */}
+      <div className="px-4 pt-5 pb-2">
+        <div
+          className="relative rounded-3xl overflow-hidden p-6"
+          style={{ background: "#000", border: "3px solid #000", boxShadow: "5px 5px 0px #FF0033" }}
+        >
+          {/* Декоративные полосы */}
+          <div className="absolute top-0 right-0 w-32 h-32 opacity-20" style={{
+            background: "radial-gradient(circle, #FFE000 0%, transparent 70%)"
           }}></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 opacity-15" style={{
+            background: "radial-gradient(circle, #FF00AA 0%, transparent 70%)"
+          }}></div>
+
           <div className="relative">
             <div className="flex items-center gap-2 mb-3">
-              <span className="live-badge text-white text-xs font-bold px-2 py-0.5 rounded-full">● ПРЯМОЙ ЭФИР</span>
-              <span className="text-white/50 text-xs">2 830 зрителей</span>
+              <span className="text-3xl">🤔</span>
+              <div>
+                <h1 className="font-oswald text-3xl font-bold text-white leading-none">ПОЧЕМУЧКА</h1>
+                <p className="text-xs text-gray-400">Платформа для авторов</p>
+              </div>
             </div>
-            <h1 className="font-oswald text-3xl font-bold text-white mb-1">
-              Дима Кодер
-            </h1>
-            <p className="text-white/70 text-sm mb-4">«Пишем мобильное приложение с нуля»</p>
-            <button
-              onClick={() => setActivePage("feed")}
-              className="btn-gradient px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-            >
-              Смотреть эфир
-            </button>
+
+            <p className="text-white/80 text-sm mb-4 leading-relaxed">
+              Создавай контент, зарабатывай на подписках и донатах, строй свою аудиторию
+            </p>
+
+            <div className="flex gap-2 mb-4">
+              <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
+                <span className="text-xs">💰</span>
+                <span className="text-[11px] text-white/80 font-medium">Заработок</span>
+              </div>
+              <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
+                <span className="text-xs">🔴</span>
+                <span className="text-[11px] text-white/80 font-medium">Эфиры</span>
+              </div>
+              <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
+                <span className="text-xs">🏆</span>
+                <span className="text-[11px] text-white/80 font-medium">Достижения</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActivePage("feed")}
+                className="flex-1 py-3 rounded-2xl text-sm font-bold btn-red"
+              >
+                ЗАРЕГИСТРИРОВАТЬСЯ
+              </button>
+              <button
+                onClick={() => setActivePage("feed")}
+                className="px-4 py-3 rounded-2xl text-sm font-bold btn-outline"
+              >
+                Войти
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* STORIES */}
-      <div className="px-4 mb-4">
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
-          {MOCK_STORIES.map((s) => (
-            <div key={s.id} className="flex-shrink-0 flex flex-col items-center gap-1">
-              <div className={`relative w-14 h-14 rounded-full flex items-center justify-center text-2xl ${s.isAdd ? "bg-white/10 border-2 border-dashed border-white/30" : "story-ring"}`}>
-                <div className={`w-[52px] h-[52px] rounded-full flex items-center justify-center text-2xl ${!s.isAdd ? "bg-[#0f0f1a]" : ""}`}>
-                  {s.avatar}
-                </div>
-                {s.isLive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap">LIVE</span>
-                )}
-              </div>
-              <span className="text-[10px] text-white/60">{s.name}</span>
+      {/* FEATURES */}
+      <div className="px-4 pt-4 pb-2">
+        <h2 className="font-oswald text-xl font-bold text-black mb-3">ЧТО ТЫ ПОЛУЧИШЬ</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { icon: "🎬", title: "Прямые эфиры", desc: "Стримь и зарабатывай", color: "g-card-red" },
+            { icon: "💎", title: "Подписки", desc: "Эксклюзив для фанатов", color: "g-card-purple" },
+            { icon: "🎁", title: "Донаты", desc: "Поддержка от зрителей", color: "g-card-blue" },
+            { icon: "🏆", title: "Уровни", desc: "Система достижений", color: "g-card-yellow" },
+          ].map((f) => (
+            <div key={f.title} className={`g-card ${f.color} p-4`}>
+              <div className="text-3xl mb-2">{f.icon}</div>
+              <p className="font-oswald font-bold text-sm text-black">{f.title}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{f.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* TRENDING TAGS */}
-      <div className="px-4 mb-3">
-        <h2 className="font-oswald text-lg font-semibold text-white/90 mb-2">🔥 В тренде</h2>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          {["Наука", "Технологии", "Кулинария", "Музыка", "Спорт", "Психология"].map((tag) => (
-            <button key={tag} className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-white/8 text-white/70 hover:bg-purple-500/30 hover:text-purple-300 border border-white/10 transition-all">
-              {tag}
-            </button>
-          ))}
+      {/* LIVE BLOCK */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-oswald text-xl font-bold text-black">🔴 СЕЙЧАС В ЭФИРЕ</h2>
+          <button onClick={() => setActivePage("feed")} className="text-xs font-bold text-red-600 font-oswald">ВСЕ →</button>
+        </div>
+        <div
+          className="g-card g-card-red p-4 flex items-center gap-4 cursor-pointer"
+          onClick={() => setActivePage("feed")}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black">
+            💻
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white font-oswald"
+                style={{ background: "#FF0033", animation: "pulse 2s infinite" }}
+              >● LIVE</span>
+              <span className="text-xs text-gray-500">2 830 зрителей</span>
+            </div>
+            <p className="font-oswald font-bold text-sm text-black">Дима Кодер</p>
+            <p className="text-xs text-gray-500">«Пишем мобильное приложение»</p>
+          </div>
+          <button className="btn-black px-3 py-2 rounded-xl text-xs text-white">
+            СМОТРЕТЬ
+          </button>
         </div>
       </div>
 
-      {/* POSTS */}
-      <div className="px-4 pt-1 space-y-4">
-        {posts.slice(0, 2).map((post, i) => (
-          <PostCard key={post.id} post={post} toggleLike={toggleLike} delay={i * 100} />
-        ))}
+      {/* SUPPORT */}
+      <div className="px-4 pt-4 pb-6">
+        <div
+          className="g-card g-card-green p-4 flex items-center gap-4"
+        >
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: "#00CC44", border: "2px solid #000" }}>
+            📞
+          </div>
+          <div className="flex-1">
+            <p className="font-oswald font-bold text-sm text-black">Нужна помощь?</p>
+            <p className="text-xs text-gray-500 mb-1">Звони — ответим быстро</p>
+            <a
+              href="tel:+79521426352"
+              className="font-oswald font-bold text-sm text-green-700"
+            >
+              +7 952 142-63-52
+            </a>
+          </div>
+          <a
+            href="tel:+79521426352"
+            className="btn-yellow px-3 py-2 rounded-xl text-xs text-black"
+          >
+            ПОЗВОНИТЬ
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -263,10 +444,13 @@ function FeedPage({ posts, toggleLike }: { posts: typeof MOCK_POSTS; toggleLike:
   return (
     <div className="px-4 pt-4 animate-fade-in">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-oswald text-2xl font-bold text-white">Лента</h2>
+        <h2 className="font-oswald text-2xl font-bold text-black">ЛЕНТА</h2>
         <div className="flex gap-1.5">
-          {["Все", "Подписки", "Рекомендации"].map((f, i) => (
-            <button key={f} className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${i === 0 ? "btn-gradient text-white" : "bg-white/8 text-white/60 border border-white/10"}`}>
+          {["Все", "Подписки", "ТОП"].map((f, i) => (
+            <button
+              key={f}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold font-oswald transition-all ${i === 0 ? "btn-black text-white" : "btn-outline text-black"}`}
+            >
               {f}
             </button>
           ))}
@@ -274,7 +458,7 @@ function FeedPage({ posts, toggleLike }: { posts: typeof MOCK_POSTS; toggleLike:
       </div>
       <div className="space-y-4">
         {posts.map((post, i) => (
-          <PostCard key={post.id} post={post} toggleLike={toggleLike} delay={i * 80} />
+          <PostCard key={post.id} post={post} toggleLike={toggleLike} delay={i * 70} />
         ))}
       </div>
     </div>
@@ -288,57 +472,54 @@ function PostCard({ post, toggleLike, delay = 0 }: {
   delay?: number;
 }) {
   return (
-    <div
-      className="card-glow rounded-2xl p-4 animate-fade-in"
-      style={{ animationDelay: `${delay}ms` }}
-    >
+    <div className="g-card p-4 animate-fade-in" style={{ animationDelay: `${delay}ms` }}>
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl border-2 border-black flex-shrink-0">
           {post.avatar}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-sm text-white">{post.author}</span>
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
-              Ур. {post.level}
-            </span>
-            {post.isPremium && (
-              <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300">
-                💎 PRO
-              </span>
-            )}
+            <span className="font-oswald font-bold text-sm text-black">{post.author}</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-black text-white">Ур.{post.level}</span>
+            {post.isPremium && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full text-black" style={{ background: "#FFE000" }}>💎 PRO</span>}
           </div>
-          <span className="text-xs text-white/40">{post.time}</span>
+          <span className="text-xs text-gray-400">{post.time}</span>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${post.tagColor}`}>
+        <span
+          className="text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 font-oswald"
+          style={{ background: post.tagBg, color: post.tagColor, border: "1.5px solid #000" }}
+        >
           {post.tag}
         </span>
       </div>
 
-      <h3 className="font-oswald text-lg font-semibold text-white mb-2 leading-tight">{post.title}</h3>
-      <p className="text-sm text-white/60 leading-relaxed mb-4">{post.text}</p>
+      <h3 className="font-oswald text-lg font-bold text-black mb-2 leading-tight">{post.title}</h3>
+      <p className="text-sm text-gray-600 leading-relaxed mb-4">{post.text}</p>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-3 border-t-2 border-black">
         <div className="flex items-center gap-4">
           <button
             onClick={() => toggleLike(post.id)}
-            className={`flex items-center gap-1.5 text-sm transition-all ${post.isLiked ? "text-pink-400" : "text-white/40 hover:text-pink-400"}`}
+            className={`flex items-center gap-1.5 text-sm font-bold font-oswald transition-all ${post.isLiked ? "text-red-600" : "text-gray-400 hover:text-red-500"}`}
           >
             <Icon name="Heart" size={18} />
-            <span className="font-medium">{post.likes.toLocaleString()}</span>
+            <span>{post.likes.toLocaleString()}</span>
           </button>
-          <button className="flex items-center gap-1.5 text-sm text-white/40 hover:text-cyan-400 transition-all">
+          <button className="flex items-center gap-1.5 text-sm font-bold font-oswald text-gray-400 hover:text-blue-600 transition-all">
             <Icon name="MessageCircle" size={18} />
             <span>{post.comments}</span>
           </button>
-          <button className="flex items-center gap-1.5 text-sm text-white/40 hover:text-purple-400 transition-all">
+          <button className="flex items-center gap-1.5 text-sm font-bold font-oswald text-gray-400 hover:text-purple-600 transition-all">
             <Icon name="Share2" size={18} />
             <span>{post.shares}</span>
           </button>
         </div>
-        <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-pink-500/15 text-pink-400 hover:bg-pink-500/25 transition-all border border-pink-500/20">
+        <button
+          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl font-bold font-oswald transition-all"
+          style={{ background: "#FF00AA", color: "#fff", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}
+        >
           <Icon name="Gift" size={14} />
-          Донат
+          ДОНАТ
         </button>
       </div>
     </div>
@@ -349,33 +530,38 @@ function PostCard({ post, toggleLike, delay = 0 }: {
 function SearchPage() {
   const [query, setQuery] = useState("");
   const categories = [
-    { icon: "🔬", label: "Наука", color: "from-cyan-500/20 to-blue-500/20 border-cyan-500/20" },
-    { icon: "💻", label: "Технологии", color: "from-purple-500/20 to-indigo-500/20 border-purple-500/20" },
-    { icon: "🎵", label: "Музыка", color: "from-pink-500/20 to-rose-500/20 border-pink-500/20" },
-    { icon: "🍕", label: "Кулинария", color: "from-orange-500/20 to-amber-500/20 border-orange-500/20" },
-    { icon: "🎨", label: "Творчество", color: "from-rose-500/20 to-pink-500/20 border-rose-500/20" },
-    { icon: "🏋️", label: "Спорт", color: "from-green-500/20 to-emerald-500/20 border-green-500/20" },
-    { icon: "🧠", label: "Психология", color: "from-violet-500/20 to-purple-500/20 border-violet-500/20" },
-    { icon: "📸", label: "Фото/Видео", color: "from-yellow-500/20 to-amber-500/20 border-yellow-500/20" },
+    { icon: "🔬", label: "Наука",       bg: "#00DDFF", color: "#000" },
+    { icon: "💻", label: "Технологии",  bg: "#8800FF", color: "#fff" },
+    { icon: "🎵", label: "Музыка",      bg: "#FF00AA", color: "#fff" },
+    { icon: "🍕", label: "Кулинария",   bg: "#FF6600", color: "#fff" },
+    { icon: "🎨", label: "Творчество",  bg: "#FFE000", color: "#000" },
+    { icon: "🏋️", label: "Спорт",      bg: "#00CC44", color: "#fff" },
+    { icon: "🧠", label: "Психология",  bg: "#0044FF", color: "#fff" },
+    { icon: "📸", label: "Фото/Видео",  bg: "#FF0033", color: "#fff" },
   ];
   return (
     <div className="px-4 pt-4 animate-fade-in">
-      <h2 className="font-oswald text-2xl font-bold text-white mb-4">Поиск</h2>
-      <div className="relative mb-6">
-        <Icon name="Search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+      <h2 className="font-oswald text-2xl font-bold text-black mb-4">ПОИСК</h2>
+      <div className="relative mb-5">
+        <Icon name="Search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Авторы, темы, посты..."
-          className="w-full bg-white/8 border border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 transition-all"
+          className="w-full bg-white border-2 border-black rounded-2xl pl-11 pr-4 py-3.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          style={{ boxShadow: "3px 3px 0px #000" }}
         />
       </div>
-      <p className="text-xs text-white/40 mb-3 uppercase tracking-wider font-medium">Категории</p>
+      <p className="font-oswald font-bold text-xs text-gray-500 mb-3 uppercase tracking-wider">Категории</p>
       <div className="grid grid-cols-2 gap-3">
         {categories.map((cat) => (
-          <button key={cat.label} className={`flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br ${cat.color} border text-left hover:scale-105 transition-transform`}>
+          <button
+            key={cat.label}
+            className="flex items-center gap-3 p-4 rounded-2xl text-left hover:scale-105 transition-transform font-oswald font-bold text-sm"
+            style={{ background: cat.bg, color: cat.color, border: "2px solid #000", boxShadow: "3px 3px 0px #000" }}
+          >
             <span className="text-2xl">{cat.icon}</span>
-            <span className="font-semibold text-white text-sm">{cat.label}</span>
+            {cat.label}
           </button>
         ))}
       </div>
@@ -388,18 +574,23 @@ function NotificationsPage() {
   return (
     <div className="px-4 pt-4 animate-fade-in">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-oswald text-2xl font-bold text-white">Уведомления</h2>
-        <button className="text-xs text-purple-400 hover:text-purple-300">Прочитать все</button>
+        <h2 className="font-oswald text-2xl font-bold text-black">УВЕДОМЛЕНИЯ</h2>
+        <button className="text-xs font-bold text-red-600 font-oswald hover:underline">Прочитать все</button>
       </div>
       <div className="space-y-2">
         {MOCK_NOTIFICATIONS.map((n) => (
-          <div key={n.id} className={`flex items-start gap-3 p-4 rounded-2xl transition-all ${n.isNew ? "card-glow" : "bg-white/4 border border-white/5"}`}>
+          <div
+            key={n.id}
+            className={`flex items-start gap-3 p-4 rounded-2xl ${n.isNew ? "g-card g-card-red" : "g-card"}`}
+          >
             <span className="text-2xl mt-0.5">{n.icon}</span>
             <div className="flex-1">
-              <p className={`text-sm ${n.isNew ? "text-white" : "text-white/60"}`}>{n.text}</p>
-              <span className="text-xs text-white/30">{n.time}</span>
+              <p className="text-sm font-semibold text-black">{n.text}</p>
+              <span className="text-xs text-gray-400">{n.time}</span>
             </div>
-            {n.isNew && <span className="w-2 h-2 rounded-full bg-purple-500 mt-2 flex-shrink-0"></span>}
+            {n.isNew && (
+              <span className="w-3 h-3 rounded-full mt-1 flex-shrink-0" style={{ background: "#FF0033" }}></span>
+            )}
           </div>
         ))}
       </div>
@@ -415,30 +606,35 @@ function MessengerPage({ activeChat, setActiveChat }: {
   if (activeChat !== null) {
     const chat = MOCK_CHATS.find(c => c.id === activeChat);
     return (
-      <div className="flex flex-col h-[calc(100vh-8rem)] animate-fade-in">
-        <div className="px-4 pt-4 pb-3 flex items-center gap-3 border-b border-white/8">
-          <button onClick={() => setActiveChat(null)} className="p-2 rounded-full hover:bg-white/10">
-            <Icon name="ArrowLeft" size={20} className="text-white/70" />
+      <div className="flex flex-col h-[calc(100vh-9rem)] animate-fade-in">
+        <div className="px-4 pt-3 pb-3 flex items-center gap-3 border-b-2 border-black bg-white">
+          <button onClick={() => setActiveChat(null)} className="p-1.5 rounded-xl hover:bg-gray-100 border-2 border-black">
+            <Icon name="ArrowLeft" size={18} className="text-black" />
           </button>
-          <span className="text-2xl">{chat?.avatar}</span>
+          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl border-2 border-black">{chat?.avatar}</div>
           <div>
-            <p className="font-semibold text-white text-sm">{chat?.name}</p>
-            <p className="text-xs text-green-400">{chat?.online ? "онлайн" : "не в сети"}</p>
+            <p className="font-oswald font-bold text-black text-sm">{chat?.name}</p>
+            <p className="text-xs" style={{ color: chat?.online ? "#00CC44" : "#999" }}>{chat?.online ? "● онлайн" : "не в сети"}</p>
           </div>
         </div>
-        <div className="flex-1 px-4 py-4 flex flex-col justify-end gap-3 overflow-y-auto">
-          <div className="self-start max-w-[75%] bg-white/10 rounded-2xl rounded-tl-sm px-4 py-2.5">
-            <p className="text-sm text-white">{chat?.msg}</p>
-            <span className="text-[10px] text-white/30">12:30</span>
+        <div className="flex-1 px-4 py-4 flex flex-col justify-end gap-3 overflow-y-auto bg-gray-50">
+          <div className="self-start max-w-[78%] bg-white rounded-2xl rounded-tl-none px-4 py-3 border-2 border-black" style={{ boxShadow: "3px 3px 0px #000" }}>
+            <p className="text-sm text-black">{chat?.msg}</p>
+            <span className="text-[10px] text-gray-400">12:30</span>
           </div>
-          <div className="self-end max-w-[75%] btn-gradient rounded-2xl rounded-tr-sm px-4 py-2.5">
+          <div className="self-end max-w-[78%] rounded-2xl rounded-tr-none px-4 py-3 border-2 border-black" style={{ background: "#FF0033", boxShadow: "3px 3px 0px #000" }}>
             <p className="text-sm text-white">Привет! Да, звучит интересно 👋</p>
-            <span className="text-[10px] text-white/70">12:31</span>
+            <span className="text-[10px] text-red-200">12:31</span>
           </div>
         </div>
-        <div className="px-4 py-3 flex gap-2">
-          <input placeholder="Сообщение..." className="flex-1 bg-white/8 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50" />
-          <button className="btn-gradient w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="px-4 py-3 flex gap-2 bg-white border-t-2 border-black">
+          <input
+            placeholder="Сообщение..."
+            className="flex-1 bg-gray-50 border-2 border-black rounded-xl px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none"
+          />
+          <button
+            className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 btn-red"
+          >
             <Icon name="Send" size={18} className="text-white" />
           </button>
         </div>
@@ -448,23 +644,26 @@ function MessengerPage({ activeChat, setActiveChat }: {
 
   return (
     <div className="px-4 pt-4 animate-fade-in">
-      <h2 className="font-oswald text-2xl font-bold text-white mb-4">Сообщения</h2>
+      <h2 className="font-oswald text-2xl font-bold text-black mb-4">СООБЩЕНИЯ</h2>
       <div className="space-y-2">
         {MOCK_CHATS.map((chat) => (
-          <button key={chat.id} onClick={() => setActiveChat(chat.id)} className="w-full flex items-center gap-3 p-4 rounded-2xl card-glow text-left">
+          <button key={chat.id} onClick={() => setActiveChat(chat.id)} className="w-full flex items-center gap-3 p-4 g-card text-left">
             <div className="relative flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-2xl">{chat.avatar}</div>
-              {chat.online && <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-400 border-2 border-[#0f0f1a]"></span>}
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl border-2 border-black">{chat.avatar}</div>
+              {chat.online && <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white" style={{ background: "#00CC44" }}></span>}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex justify-between items-center mb-0.5">
-                <span className="font-semibold text-sm text-white">{chat.name}</span>
-                <span className="text-xs text-white/30">{chat.time}</span>
+                <span className="font-oswald font-bold text-sm text-black">{chat.name}</span>
+                <span className="text-xs text-gray-400">{chat.time}</span>
               </div>
-              <p className="text-xs text-white/50 truncate">{chat.msg}</p>
+              <p className="text-xs text-gray-500 truncate">{chat.msg}</p>
             </div>
             {chat.unread > 0 && (
-              <span className="w-5 h-5 rounded-full btn-gradient flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">
+              <span
+                className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0 font-oswald"
+                style={{ background: "#FF0033", border: "2px solid #000" }}
+              >
                 {chat.unread}
               </span>
             )}
@@ -478,41 +677,44 @@ function MessengerPage({ activeChat, setActiveChat }: {
 /* ─── SUBSCRIPTIONS PAGE ─── */
 function SubscriptionsPage() {
   const authors = [
-    { id: 1, name: "Алина Сова", avatar: "🦉", category: "Наука", followers: "12.4K", level: 42, subscribed: true },
-    { id: 2, name: "Дима Кодер", avatar: "💻", category: "Технологии", followers: "89.1K", level: 78, subscribed: true },
-    { id: 3, name: "Марина Шеф", avatar: "👩‍🍳", category: "Кулинария", followers: "34.2K", level: 25, subscribed: false },
-    { id: 4, name: "Артём Гитара", avatar: "🎸", category: "Музыка", followers: "56.7K", level: 61, subscribed: true },
+    { id: 1, name: "Алина Сова", avatar: "🦉", category: "Наука", followers: "12.4K", level: 42, subscribed: true, color: "#00DDFF" },
+    { id: 2, name: "Дима Кодер", avatar: "💻", category: "Технологии", followers: "89.1K", level: 78, subscribed: true, color: "#8800FF" },
+    { id: 3, name: "Марина Шеф", avatar: "👩‍🍳", category: "Кулинария", followers: "34.2K", level: 25, subscribed: false, color: "#FF6600" },
+    { id: 4, name: "Артём Гитара", avatar: "🎸", category: "Музыка", followers: "56.7K", level: 61, subscribed: true, color: "#FF00AA" },
   ];
   const [subs, setSubs] = useState(authors);
 
   return (
     <div className="px-4 pt-4 animate-fade-in">
-      <h2 className="font-oswald text-2xl font-bold text-white mb-4">Подписки</h2>
+      <h2 className="font-oswald text-2xl font-bold text-black mb-4">ПОДПИСКИ</h2>
       <div className="flex gap-2 mb-4">
         {["Мои подписки", "Рекомендации"].map((t, i) => (
-          <button key={t} className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${i === 0 ? "btn-gradient text-white" : "bg-white/8 text-white/60 border border-white/10"}`}>
+          <button key={t} className={`px-4 py-2 rounded-full text-sm font-bold font-oswald transition-all ${i === 0 ? "btn-black text-white" : "btn-outline text-black"}`}>
             {t}
           </button>
         ))}
       </div>
       <div className="space-y-3">
         {subs.map((a) => (
-          <div key={a.id} className="card-glow rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-2xl flex-shrink-0">{a.avatar}</div>
+          <div key={a.id} className="g-card p-4 flex items-center gap-3">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black"
+              style={{ background: a.color + "33" }}
+            >
+              {a.avatar}
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                <span className="font-semibold text-white text-sm">{a.name}</span>
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">Ур. {a.level}</span>
+                <span className="font-oswald font-bold text-black text-sm">{a.name}</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-black text-white">Ур.{a.level}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-white/40">
-                <span>{a.category}</span>
-                <span>•</span>
-                <span>{a.followers} подписчиков</span>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span>{a.category}</span><span>•</span><span>{a.followers}</span>
               </div>
             </div>
             <button
               onClick={() => setSubs(subs.map(s => s.id === a.id ? { ...s, subscribed: !s.subscribed } : s))}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex-shrink-0 ${a.subscribed ? "bg-white/10 text-white/60 border border-white/15" : "btn-gradient text-white"}`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold font-oswald flex-shrink-0 transition-all ${a.subscribed ? "btn-outline text-black" : "btn-red text-white"}`}
             >
               {a.subscribed ? "Отписаться" : "Подписаться"}
             </button>
@@ -523,52 +725,163 @@ function SubscriptionsPage() {
   );
 }
 
+/* ─── MANAGER PAGE ─── */
+function ManagerPage() {
+  const posts_mgr = [
+    { id: 1, title: "Почему небо голубое?", views: "4 210", income: "320₽", status: "опубликован", statusColor: "#00CC44" },
+    { id: 2, title: "Как работает ИИ", views: "12 830", income: "1 840₽", status: "опубликован", statusColor: "#00CC44" },
+    { id: 3, title: "Секрет пасты", views: "2 100", income: "0₽", status: "черновик", statusColor: "#FF6600" },
+  ];
+
+  return (
+    <div className="px-4 pt-4 animate-fade-in">
+      <h2 className="font-oswald text-2xl font-bold text-black mb-1">МЕНЕДЖЕР</h2>
+      <p className="text-sm text-gray-500 mb-4">Управляй контентом и доходами</p>
+
+      {/* STATS GRID */}
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        {MANAGER_STATS.map((s) => (
+          <div
+            key={s.label}
+            className="g-card p-4"
+            style={{ borderColor: s.color, boxShadow: `3px 3px 0px ${s.color}` }}
+          >
+            <p className="font-oswald text-2xl font-bold text-black">{s.value}</p>
+            <p className="text-xs text-gray-500 mb-1">{s.label}</p>
+            <span
+              className="text-[11px] font-bold px-2 py-0.5 rounded-full font-oswald"
+              style={{ background: s.color + "22", color: s.color, border: `1.5px solid ${s.color}` }}
+            >
+              {s.change} этот месяц
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* ВЫРУЧКА БЛОК */}
+      <div
+        className="g-card g-card-yellow p-4 mb-5 flex items-center gap-4"
+      >
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border-2 border-black flex-shrink-0"
+          style={{ background: "#FFE000" }}
+        >
+          💰
+        </div>
+        <div className="flex-1">
+          <p className="font-oswald font-bold text-black">Доступно к выводу</p>
+          <p className="font-oswald text-3xl font-bold text-black">12 340₽</p>
+        </div>
+        <button className="btn-black px-4 py-2.5 rounded-xl text-sm text-white">
+          ВЫВЕСТИ
+        </button>
+      </div>
+
+      {/* POSTS LIST */}
+      <div className="flex items-center justify-between mb-3">
+        <p className="font-oswald font-bold text-black">МОИ ПОСТЫ</p>
+        <button
+          className="btn-red px-3 py-1.5 rounded-xl text-xs text-white flex items-center gap-1"
+        >
+          <Icon name="Plus" size={14} /> СОЗДАТЬ
+        </button>
+      </div>
+      <div className="space-y-2">
+        {posts_mgr.map((p) => (
+          <div key={p.id} className="g-card p-4 flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="font-oswald font-bold text-sm text-black truncate">{p.title}</p>
+              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                <span>👁 {p.views}</span>
+                <span>💰 {p.income}</span>
+              </div>
+            </div>
+            <span
+              className="text-[10px] font-bold px-2 py-1 rounded-full font-oswald flex-shrink-0"
+              style={{ background: p.statusColor + "22", color: p.statusColor, border: `1.5px solid ${p.statusColor}` }}
+            >
+              {p.status}
+            </span>
+            <button className="p-1.5 rounded-lg hover:bg-gray-100">
+              <Icon name="MoreVertical" size={16} className="text-gray-400" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* MONETIZE TOOLS */}
+      <div className="mt-5 mb-2">
+        <p className="font-oswald font-bold text-black mb-3">ИНСТРУМЕНТЫ</p>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { icon: "🎁", label: "Подписки", color: "g-card-purple", bg: "#8800FF" },
+            { icon: "💳", label: "Продажи", color: "g-card-blue", bg: "#0044FF" },
+            { icon: "📊", label: "Аналитика", color: "g-card-green", bg: "#00CC44" },
+            { icon: "🎬", label: "Эфиры", color: "g-card-red", bg: "#FF0033" },
+          ].map((t) => (
+            <button
+              key={t.label}
+              className={`g-card ${t.color} p-4 flex items-center gap-3 text-left hover:scale-105 transition-transform`}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 border-2 border-black"
+                style={{ background: t.bg }}
+              >
+                {t.icon}
+              </div>
+              <span className="font-oswald font-bold text-sm text-black">{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── PROFILE PAGE ─── */
 function ProfilePage() {
   return (
     <div className="animate-fade-in">
-      <div className="h-36 w-full" style={{
-        background: "linear-gradient(135deg, #4c1d95, #be185d, #0e7490)"
-      }}></div>
+      <div className="h-32 w-full stripe-bg" style={{ background: "#FFE000", borderBottom: "3px solid #000" }}>
+        <div className="h-full flex items-center px-6">
+          <span className="font-oswald text-4xl font-black text-black opacity-10 select-none">ПОЧЕМУЧКА</span>
+        </div>
+      </div>
       <div className="px-4 pb-6">
         <div className="flex items-end justify-between -mt-10 mb-4">
-          <div className="story-ring w-20 h-20 rounded-full">
-            <div className="w-[76px] h-[76px] rounded-full bg-[#0f0f1a] flex items-center justify-center text-4xl">
-              😎
-            </div>
+          <div
+            className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center text-4xl border-3 border-black"
+            style={{ border: "3px solid #000", boxShadow: "4px 4px 0px #000" }}
+          >
+            😎
           </div>
-          <button className="px-4 py-2 rounded-full border border-purple-500/40 text-purple-300 text-sm font-medium hover:bg-purple-500/10 transition-all">
-            Редактировать
-          </button>
+          <button className="btn-outline px-4 py-2 rounded-xl text-sm">Редактировать</button>
         </div>
 
-        <h2 className="font-oswald text-2xl font-bold text-white">Александр Иванов</h2>
-        <p className="text-white/50 text-sm mb-4">@alex_curious · Спрашиваю обо всём 🤔</p>
+        <h2 className="font-oswald text-2xl font-bold text-black">Александр Иванов</h2>
+        <p className="text-gray-500 text-sm mb-4">@alex_curious · Спрашиваю обо всём 🤔</p>
 
         {/* LEVEL BAR */}
-        <div className="card-glow rounded-2xl p-4 mb-4">
+        <div className="g-card g-card-yellow p-4 mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-white font-medium">Уровень 34 — Исследователь</span>
-            <span className="text-xs text-purple-400">2 340 / 3 000 XP</span>
+            <span className="font-oswald font-bold text-sm text-black">Уровень 34 — Исследователь</span>
+            <span className="text-xs font-bold text-gray-600">2 340 / 3 000 XP</span>
           </div>
-          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full rounded-full" style={{
-              width: "78%",
-              background: "linear-gradient(90deg, #a855f7, #ec4899)"
-            }}></div>
+          <div className="h-3 bg-gray-200 rounded-full overflow-hidden border-2 border-black">
+            <div className="h-full rounded-full" style={{ width: "78%", background: "#FFE000" }}></div>
           </div>
         </div>
 
         {/* STATS */}
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { label: "Подписчики", value: "4 280" },
-            { label: "Посты", value: "127" },
-            { label: "Донаты", value: "18.4K₽" },
+            { label: "Подписчики", value: "4 280", color: "#FF00AA" },
+            { label: "Посты", value: "127", color: "#0044FF" },
+            { label: "Донаты", value: "18.4K₽", color: "#00CC44" },
           ].map((s) => (
-            <div key={s.label} className="card-glow rounded-xl p-3 text-center">
-              <p className="font-oswald text-xl font-bold gradient-text">{s.value}</p>
-              <p className="text-xs text-white/40">{s.label}</p>
+            <div key={s.label} className="g-card p-3 text-center" style={{ borderColor: s.color, boxShadow: `3px 3px 0px ${s.color}` }}>
+              <p className="font-oswald text-xl font-bold text-black">{s.value}</p>
+              <p className="text-xs text-gray-500">{s.label}</p>
             </div>
           ))}
         </div>
@@ -576,33 +889,36 @@ function ProfilePage() {
         {/* ACHIEVEMENTS */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-white/80">Достижения</p>
-            <button className="text-xs text-purple-400">Все →</button>
+            <p className="font-oswald font-bold text-black">ДОСТИЖЕНИЯ</p>
+            <button className="text-xs font-bold text-red-600 font-oswald">Все →</button>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {ACHIEVEMENTS.map((a) => (
-              <div key={a.title} className={`rounded-xl p-3 text-center transition-all ${a.unlocked ? "card-glow" : "bg-white/4 border border-white/5 opacity-40"}`}>
+              <div
+                key={a.title}
+                className={`g-card p-3 text-center ${!a.unlocked ? "opacity-40" : ""}`}
+              >
                 <div className="text-2xl mb-1">{a.icon}</div>
-                <p className="text-[10px] text-white/70 font-medium leading-tight">{a.title}</p>
+                <p className="text-[10px] font-bold text-black font-oswald">{a.title}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* MONETIZATION */}
-        <div className="card-glow rounded-2xl p-4">
+        <div className="g-card g-card-red p-4">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">💰</span>
-            <p className="font-semibold text-white text-sm">Монетизация</p>
+            <p className="font-oswald font-bold text-black">МОНЕТИЗАЦИЯ</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <button className="p-3 rounded-xl bg-purple-500/15 border border-purple-500/20 text-center hover:bg-purple-500/25 transition-all">
+            <button className="p-3 rounded-xl text-center hover:opacity-90 transition-all" style={{ background: "#8800FF", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
               <p className="text-2xl mb-1">🎁</p>
-              <p className="text-xs text-purple-300 font-medium">Подписки</p>
+              <p className="text-xs text-white font-bold font-oswald">Подписки</p>
             </button>
-            <button className="p-3 rounded-xl bg-pink-500/15 border border-pink-500/20 text-center hover:bg-pink-500/25 transition-all">
+            <button className="p-3 rounded-xl text-center hover:opacity-90 transition-all" style={{ background: "#FF00AA", border: "2px solid #000", boxShadow: "2px 2px 0px #000" }}>
               <p className="text-2xl mb-1">💎</p>
-              <p className="text-xs text-pink-300 font-medium">Продажи</p>
+              <p className="text-xs text-white font-bold font-oswald">Продажи</p>
             </button>
           </div>
         </div>
@@ -614,43 +930,70 @@ function ProfilePage() {
 /* ─── SUPPORT PAGE ─── */
 function SupportPage() {
   const topics = [
-    { icon: "💳", title: "Оплата и монетизация", desc: "Выводы, донаты, подписки" },
-    { icon: "🔒", title: "Безопасность", desc: "Пароль, аккаунт, конфиденциальность" },
-    { icon: "🐛", title: "Сообщить об ошибке", desc: "Что-то не работает?" },
-    { icon: "💡", title: "Предложить идею", desc: "Хотите новую функцию?" },
-    { icon: "📋", title: "Правила платформы", desc: "Что можно, что нельзя" },
-    { icon: "📞", title: "Связаться с нами", desc: "Живой чат с поддержкой" },
+    { icon: "💳", title: "Оплата и монетизация", desc: "Выводы, донаты, подписки", color: "#00CC44" },
+    { icon: "🔒", title: "Безопасность", desc: "Пароль, аккаунт", color: "#0044FF" },
+    { icon: "🐛", title: "Сообщить об ошибке", desc: "Что-то не работает?", color: "#FF0033" },
+    { icon: "💡", title: "Предложить идею", desc: "Хотите новую функцию?", color: "#FFE000" },
+    { icon: "📋", title: "Правила платформы", desc: "Что можно, что нельзя", color: "#8800FF" },
   ];
+
   return (
     <div className="px-4 pt-4 animate-fade-in">
-      <h2 className="font-oswald text-2xl font-bold text-white mb-1">Поддержка</h2>
-      <p className="text-white/40 text-sm mb-5">Чем можем помочь?</p>
-      <div className="relative mb-5">
-        <Icon name="Search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-        <input
-          placeholder="Поиск по справке..."
-          className="w-full bg-white/8 border border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50"
-        />
+      <h2 className="font-oswald text-2xl font-bold text-black mb-1">ПОДДЕРЖКА</h2>
+      <p className="text-gray-500 text-sm mb-5">Чем можем помочь?</p>
+
+      {/* PHONE BLOCK */}
+      <div
+        className="g-card g-card-green p-5 mb-5 flex items-center gap-4"
+      >
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border-2 border-black flex-shrink-0"
+          style={{ background: "#00CC44" }}
+        >
+          📞
+        </div>
+        <div className="flex-1">
+          <p className="font-oswald font-bold text-black mb-0.5">Живая поддержка</p>
+          <a href="tel:+79521426352" className="font-oswald text-xl font-bold text-black block">
+            +7 952 142-63-52
+          </a>
+          <p className="text-xs text-gray-500">Пн–Пт 9:00–21:00</p>
+        </div>
+        <a
+          href="tel:+79521426352"
+          className="btn-yellow px-4 py-3 rounded-xl text-sm font-bold text-black"
+        >
+          ПОЗВОНИТЬ
+        </a>
       </div>
+
+      {/* TOPICS */}
       <div className="space-y-2">
         {topics.map((t) => (
-          <button key={t.title} className="w-full card-glow rounded-2xl p-4 flex items-center gap-4 text-left hover:scale-[1.01] transition-transform">
-            <span className="text-2xl">{t.icon}</span>
-            <div className="flex-1">
-              <p className="font-semibold text-white text-sm">{t.title}</p>
-              <p className="text-xs text-white/40">{t.desc}</p>
+          <button
+            key={t.title}
+            className="w-full g-card p-4 flex items-center gap-4 text-left hover:scale-[1.01] transition-transform"
+            style={{ borderColor: t.color, boxShadow: `3px 3px 0px ${t.color}` }}
+          >
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 border-2 border-black"
+              style={{ background: t.color + "33" }}
+            >
+              {t.icon}
             </div>
-            <Icon name="ChevronRight" size={18} className="text-white/20" />
+            <div className="flex-1">
+              <p className="font-oswald font-bold text-black text-sm">{t.title}</p>
+              <p className="text-xs text-gray-400">{t.desc}</p>
+            </div>
+            <Icon name="ChevronRight" size={18} className="text-gray-300" />
           </button>
         ))}
       </div>
-      <div className="mt-6 p-4 rounded-2xl text-center" style={{
-        background: "linear-gradient(135deg, rgba(168,85,247,0.1), rgba(236,72,153,0.1))",
-        border: "1px solid rgba(168,85,247,0.2)"
-      }}>
-        <p className="text-2xl mb-2">🚀</p>
-        <p className="font-semibold text-white text-sm mb-1">Среднее время ответа</p>
-        <p className="text-2xl font-oswald font-bold gradient-text">~15 минут</p>
+
+      <div className="mt-5 g-card g-card-yellow p-4 text-center">
+        <p className="text-2xl mb-1">⚡</p>
+        <p className="font-oswald font-bold text-black mb-0.5">Среднее время ответа</p>
+        <p className="font-oswald text-3xl font-black text-black">~15 минут</p>
       </div>
     </div>
   );
